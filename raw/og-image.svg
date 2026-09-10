@@ -16,16 +16,19 @@
   <rect width="1200" height="630" fill="#f3f3f3" />
   <rect width="1200" height="630" fill="url(#paper)" />
 
-  <rect x="238.25" y="60" width="723.5" height="510" rx="39"
-        fill="#ffffff" stroke="#7f52c3" stroke-width="9" filter="url(#card-shadow)" />
+  <g transform="rotate(180 600 315)">
+    <rect x="238.25" y="60" width="723.5" height="510" rx="39"
+          fill="#ffffff" stroke="#7f52c3" stroke-width="9" filter="url(#card-shadow)" />
 
-  <!-- Open dots carry the same 15%-opacity tint fill as .dot (app.css), not an empty one. -->
-  <g stroke-width="11.86">
-    <circle cx="386.5" cy="208.3" r="59.3" stroke="#845dc8" fill="#845dc8" />
-    <circle cx="600"   cy="208.3" r="59.3" stroke="#2d9a4e" fill="#2d9a4e" fill-opacity="0.15" />
-    <circle cx="813.5" cy="208.3" r="59.3" stroke="#e63946" fill="#e63946" />
-    <circle cx="386.5" cy="421.7" r="59.3" stroke="#d6459b" fill="#d6459b" fill-opacity="0.15" />
-    <circle cx="600"   cy="421.7" r="59.3" stroke="#2f7fd8" fill="#2f7fd8" />
-    <circle cx="813.5" cy="421.7" r="59.3" stroke="#e47503" fill="#e47503" fill-opacity="0.15" />
+    <!-- Open dots carry the same styling as .dot.open (app.css): a 15%-opacity
+         tint fill, then the whole dot faded to 25% opacity on top. -->
+    <g stroke-width="11.86">
+      <circle cx="386.5" cy="208.3" r="59.3" stroke="#845dc8" fill="#845dc8" />
+      <circle cx="600"   cy="208.3" r="59.3" stroke="#2d9a4e" fill="#2d9a4e" fill-opacity="0.15" opacity="0.25" />
+      <circle cx="813.5" cy="208.3" r="59.3" stroke="#e63946" fill="#e63946" />
+      <circle cx="386.5" cy="421.7" r="59.3" stroke="#d6459b" fill="#d6459b" fill-opacity="0.15" opacity="0.25" />
+      <circle cx="600"   cy="421.7" r="59.3" stroke="#2f7fd8" fill="#2f7fd8" />
+      <circle cx="813.5" cy="421.7" r="59.3" stroke="#e47503" fill="#e47503" fill-opacity="0.15" opacity="0.25" />
+    </g>
   </g>
 </svg>
