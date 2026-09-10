@@ -1,10 +1,8 @@
 <script lang="ts">
-  import {
-    CARD_W, CARD_H, DOT_COLS, DOT_R, DOT_STROKE, DOT_X0, DOT_Y0, DOT_SPACING,
-  } from '../lib/constants';
   import { app } from '../lib/AppState.svelte';
   import type { Highlight } from '../lib/Game.svelte';
-  import { COLORS, isSolid, type Card } from '../lib/game-utils';
+  import type { Card } from '../lib/game-utils';
+  import CardFace from './CardFace.svelte';
 
   type Props = {
     card: Card;
@@ -34,17 +32,7 @@
   {onpointerdown}
   {onkeydown}
 >
-  <svg viewBox="0 0 {CARD_W} {CARD_H}" class="card-svg" preserveAspectRatio="xMidYMid meet">
-    {#each COLORS as color, i}
-      <circle
-        cx={DOT_X0 + (i % DOT_COLS) * DOT_SPACING}
-        cy={DOT_Y0 + Math.floor(i / DOT_COLS) * DOT_SPACING}
-        r={DOT_R}
-        stroke-width={DOT_STROKE}
-        class="dot color-{color} {isSolid(card, i) ? 'solid' : 'open'}"
-      />
-    {/each}
-  </svg>
+  <CardFace {card} />
 </div>
 
 <style>
@@ -94,22 +82,6 @@
     border-color: var(--hint-highlight) !important;
     box-shadow: 0 0 0 3px var(--hint-glow), 0 5px 14px var(--shadow-hover) !important;
     transform: translateY(-2px);
-  }
-
-  .card-svg {
-    width: 100%;
-    height: 100%;
-    display: block;
-    overflow: visible;
-  }
-
-  /* Rotate symbols sideways when the card is landscape */
-  @container (aspect-ratio > 1) {
-    .card-svg {
-      width: 100cqh;
-      height: 100cqw;
-      transform: rotate(90deg);
-    }
   }
 
   @keyframes pulse-valid {

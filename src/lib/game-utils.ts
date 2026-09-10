@@ -33,11 +33,17 @@ export function generateDeck(): Card[] {
   return shuffle(Array.from({ length: DECK_SIZE }, (_, i) => i + 1));
 }
 
+// The XOR of a set of cards: bit i is set when that colour is solid an odd
+// number of times across them. It is also the one card that would complete the
+// set into a proset.
+export const xorOf = (cards: Card[]): Card =>
+  cards.reduce((xor, c) => xor ^ c, 0);
+
 // A proset is any non-empty set of cards where every colour is solid an even
 // number of times. Per colour that is parity, so all six colours at once is an
 // XOR of zero.
 export function isValidProset(cards: Card[]): boolean {
-  return cards.length > 0 && cards.reduce((xor, c) => xor ^ c, 0) === 0;
+  return cards.length > 0 && xorOf(cards) === 0;
 }
 
 // The smallest proset among `cards`, as indices into it — the least

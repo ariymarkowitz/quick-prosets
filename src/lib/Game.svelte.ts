@@ -1,5 +1,5 @@
 import { untrack } from 'svelte';
-import { generateDeck, isValidProset, findProset, type Card } from './game-utils.js';
+import { generateDeck, isValidProset, findProset, xorOf, type Card } from './game-utils.js';
 import { BOARD_SIZE, DEAL_SETTLE_MS, MODE_TIMINGS } from './constants.js';
 import { createTimer } from './timer.svelte.js';
 
@@ -66,6 +66,15 @@ export class Game {
 
   activeEntries = $derived(this.board.filter(e => e.card !== null));
   animating = $derived(this.resolution !== null);
+
+  selectedCards = $derived(
+    this.selectedIds.map(id => this.board.find(e => e.id === id)?.card ?? 0)
+  );
+
+  // The selection's parity, as a card: solid where that colour is currently
+  // solid an odd number of times. It blanks out exactly when the selection is a
+  // proset, and until then it is the card that would complete one.
+  parity = $derived(xorOf(this.selectedCards));
 
   #deps: GameDeps;
 
@@ -154,8 +163,7 @@ export class Game {
 
     // The selection is claimed the moment it becomes a proset — of any size,
     // so there is nothing to submit and no wrong answer to reject.
-    const cards = this.selectedIds.map(sid => this.board.find(e => e.id === sid)!.card!);
-    if (isValidProset(cards)) {
+    if (isValidProset(this.selectedCards)) {
       this.resolution = { stage: 'flash', ids: this.selectedIds };
     }
   }

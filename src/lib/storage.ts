@@ -4,6 +4,7 @@ import type { GameMode } from './Game.svelte.js';
 const THEME_KEY = 'proset-game-theme';
 const SCORES_KEY = 'proset-game-scores';
 const MODE_KEY = 'proset-game-mode';
+const PARITY_KEY = 'proset-game-parity';
 
 export function getStoredTheme(): Theme {
   const stored = localStorage.getItem(THEME_KEY);
@@ -23,6 +24,14 @@ export function getMode(): GameMode {
 
 export function setMode(mode: GameMode): void {
   localStorage.setItem(MODE_KEY, mode);
+}
+
+export function getShowParity(): boolean {
+  return localStorage.getItem(PARITY_KEY) === 'true';
+}
+
+export function setShowParity(show: boolean): void {
+  localStorage.setItem(PARITY_KEY, String(show));
 }
 
 export function getScores(): number[] {

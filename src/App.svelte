@@ -6,7 +6,7 @@
   import MenuModal from './components/MenuModal.svelte';
   import { app } from './lib/AppState.svelte';
   import { Game } from './lib/Game.svelte';
-  import { getScores, getMode, setMode, getStoredTheme, setTheme, saveScore as persistScore } from './lib/storage';
+  import { getScores, getMode, setMode, getStoredTheme, setTheme, getShowParity, setShowParity, saveScore as persistScore } from './lib/storage';
   import { VICTORY_MESSAGES, CARD_W, CARD_H } from './lib/constants';
 
   // The grid cell has to be the same shape as the card viewBox, or
@@ -18,6 +18,7 @@
   app.scores = getScores();
   app.mode = getMode();
   app.theme = getStoredTheme();
+  app.showParity = getShowParity();
 
   let gameCounter = $state(0);
   let modalAnimating = $state(false);
@@ -86,6 +87,7 @@
 
   $effect(() => setMode(app.mode));
   $effect(() => setTheme(app.theme));
+  $effect(() => setShowParity(app.showParity));
 
   $effect(() => {
     const onChange = () => {

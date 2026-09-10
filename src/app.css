@@ -150,8 +150,7 @@ body.dark::after {
 /* ─── Layout ────────────────────────────────────────────────────────────────── */
 
 #game {
-  position: relative;
-  z-index: 1;
+  position: relative; /* Allow for blending with game background */
   max-width: min(1000px, 190dvh);
   margin: 0 auto;
   height: 100vh;
@@ -260,6 +259,10 @@ button:active {
 
 .dot.solid {
   fill: var(--dot-color);
+}
+
+.dot.open {
+  opacity: 0.25;
 }
 
 .color-red    { --dot-color: var(--dot-red); }

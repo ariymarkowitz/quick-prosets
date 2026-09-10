@@ -1,6 +1,7 @@
 <script lang="ts">
   import { app } from '../lib/AppState.svelte';
   import Card from './Card.svelte';
+  import ParityCard from './ParityCard.svelte';
 
   let { onCardsExited }: { onCardsExited: () => void } = $props();
 
@@ -21,7 +22,7 @@
 </script>
 
 <main id="card-grid-wrap">
-  <div id="card-grid">
+  <div id="card-grid" class:with-parity={app.showParity}>
     {#if app.cardsMounted}
       {#each app.game?.board ?? [] as entry (entry.id)}
         <div class="card-slot">
@@ -44,6 +45,11 @@
           {/if}
         </div>
       {/each}
+      {#if app.showParity}
+        <div class="parity-slot">
+          <ParityCard />
+        </div>
+      {/if}
     {/if}
   </div>
 </main>
@@ -64,6 +70,9 @@
        half-cards: three lanes of six half-columns, each card spanning two. */
     --card-w: var(--card-short);
     --card-h: var(--card-long);
+    /* How far the 2-3-2 moves down its own axis to make room for a lane in
+       front of it — counted in whatever that axis's tracks are. */
+    --row-shift: 0;
     display: grid;
     grid-template-columns: repeat(6, 1fr);
     grid-template-rows: repeat(3, 1fr);
@@ -86,11 +95,31 @@
   .card-slot:nth-child(7) { --lane: 3; --pos: 4; }
 
   .card-slot {
-    grid-row: var(--lane);
+    grid-row: calc(var(--lane) + var(--row-shift));
     grid-column: var(--pos) / span 2;
     display: flex;
     flex-direction: column;
     min-height: 0;
+  }
+
+  /* The parity card takes a full lane of its own in front of the 2-3-2, which
+     makes it exactly the size of a real card. */
+  #card-grid.with-parity {
+    --row-shift: 1;
+    grid-template-rows: repeat(4, 1fr);
+    aspect-ratio: calc(3 * var(--card-w)) / calc(4 * var(--card-h));
+  }
+
+  .parity-slot {
+    grid-row: 1;
+    grid-column: 3 / span 2;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .parity-slot > :global(.parity-card) {
+    flex: 1;
   }
 
   /* Turn the whole arrangement on its side — lanes become columns of 2-3-2 —
@@ -106,7 +135,20 @@
 
     .card-slot {
       grid-column: var(--lane);
-      grid-row: var(--pos) / span 2;
+      grid-row: calc(var(--pos) + var(--row-shift)) / span 2;
+    }
+
+    /* The board turns on its side; the parity card stays above it. Lanes run
+       across now, and the rows it has to clear are half-cards, hence two. */
+    #card-grid.with-parity {
+      --row-shift: 2;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(8, 1fr);
+    }
+
+    .parity-slot {
+      grid-column: 2;
+      grid-row: 1 / span 2;
     }
   }
 

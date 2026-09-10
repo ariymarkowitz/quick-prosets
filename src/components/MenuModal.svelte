@@ -51,6 +51,18 @@
       ><span class="theme-icon"></span></button>
     </div>
 
+    <button
+      type="button"
+      class="option-row"
+      class:active={app.showParity}
+      role="switch"
+      aria-checked={app.showParity}
+      onclick={() => (app.showParity = !app.showParity)}
+    >
+      Parity card
+      <span class="switch" aria-hidden="true"></span>
+    </button>
+
     <div class="menu-row">
       <button class="menu-btn" onclick={() => (view = 'help')}>How to Play</button>
       <button class="menu-btn" onclick={() => (view = 'leaderboard')}>Leaderboard</button>
@@ -75,6 +87,7 @@
         <li>This rule must be satisfied across all 6 colours.</li>
       </ul>
       <p>Tap cards to select them. As soon as you select a proset the cards are taken and replaced. Try to clear the deck as fast as you can!</p>
+      <p>The <strong>parity card</strong> option puts a faded card above the board showing which colours are still odd. Empty it and you have a proset.</p>
     </div>
     <button id="play-again-btn" onclick={() => (view = 'main')}>Back</button>
   {:else if view === 'leaderboard'}
@@ -155,6 +168,54 @@
   .menu-row {
     display: flex;
     gap: 8px;
+  }
+
+  /* A labelled switch, sized to sit in the same stack as the menu buttons. */
+  .option-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: var(--radius-md);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .option-row.active {
+    color: var(--text);
+  }
+
+  .switch {
+    flex: 0 0 auto;
+    position: relative;
+    width: 34px;
+    height: 20px;
+    border-radius: 999px;
+    background: var(--border);
+    transition: background-color var(--dur-quick) ease;
+  }
+
+  .option-row.active .switch {
+    background: var(--accent);
+  }
+
+  .switch::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 2px var(--shadow-strong);
+    transition: translate var(--dur-quick) ease;
+  }
+
+  .option-row.active .switch::after {
+    translate: 14px 0;
   }
 
   .menu-btn {

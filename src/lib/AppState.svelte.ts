@@ -18,6 +18,7 @@ class AppState {
   phase: Phase = $state({ kind: 'intro' });
   mode: GameMode = $state('chill');
   theme: Theme = $state('light');
+  showParity: boolean = $state(false);
   scores: number[] = $state([]);
   pendingAction: PendingAction | null = $state(null);
   cardsExiting: boolean = $state(false);
