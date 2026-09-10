@@ -65,7 +65,11 @@
         onclick={() => (app.showParity = !app.showParity)}
       >
         Show parity hint
-        <span class="switch" aria-hidden="true"></span>
+        <span
+          class="parity-switch"
+          class:solid={app.showParity}
+          aria-hidden="true"
+        ></span>
       </button>
       <button
         class="menu-btn icon-btn"
@@ -245,35 +249,41 @@
     color: var(--text);
   }
 
-  .switch {
+  /* On is a solid circle, off is an open one — the same two states a card's
+     circles have, in the same proportions: a card circle is 22 units across and
+     strokes 2 of them. .color-purple, which sets --dot-color, is global. Unlike
+     a card dot, the fill sits inset from the stroke with a visible gap, radio-
+     button style, so the ring stays legible in both states. */
+  .parity-switch {
+    --switch-size: 20px;
+    --switch-gap: 2px;
     flex: 0 0 auto;
+    box-sizing: border-box;
+    width: var(--switch-size);
+    height: var(--switch-size);
+    border-radius: 50%;
+    border: 2.5px solid var(--accent);
     position: relative;
-    width: 34px;
-    height: 20px;
-    border-radius: 999px;
-    background: var(--border);
-    transition: background-color var(--dur-quick) ease;
+    opacity: 0.5;
+    transition: opacity var(--dur-quick) ease;
   }
 
-  .option-row.active .switch {
-    background: var(--accent);
-  }
-
-  .switch::after {
+  .parity-switch::after {
     content: '';
     position: absolute;
-    top: 3px;
-    left: 3px;
-    width: 14px;
-    height: 14px;
+    inset: var(--switch-gap);
     border-radius: 50%;
-    background: #fff;
-    box-shadow: 0 1px 2px var(--shadow-strong);
-    transition: translate var(--dur-quick) ease;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity var(--dur-quick) ease;
   }
 
-  .option-row.active .switch::after {
-    translate: 14px 0;
+  .parity-switch.solid {
+    opacity: 1;
+  }
+
+  .parity-switch.solid::after {
+    opacity: 1;
   }
 
   .menu-btn {
