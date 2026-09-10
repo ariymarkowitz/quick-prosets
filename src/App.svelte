@@ -111,7 +111,6 @@
     const root = document.documentElement.style;
     root.setProperty('--deal-duration', `${app.animSettings.dealDuration}ms`);
     root.setProperty('--remove-duration', `${app.animSettings.removeDuration}ms`);
-    root.setProperty('--shake-duration', `${app.animSettings.shakeDuration}ms`);
   });
 </script>
 

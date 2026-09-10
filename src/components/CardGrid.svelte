@@ -60,34 +60,54 @@
   }
 
   #card-grid {
-    --cols: 3;
-    --rows: 4;
+    /* The 2-3-2 rows are offset by half a card, so the grid is laid out in
+       half-cards: three lanes of six half-columns, each card spanning two. */
     --card-w: var(--card-short);
     --card-h: var(--card-long);
     display: grid;
-    grid-template-columns: repeat(var(--cols), 1fr);
-    grid-template-rows: repeat(var(--rows), 1fr);
-    aspect-ratio: calc(var(--cols) * var(--card-w)) / calc(var(--rows) * var(--card-h));
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    aspect-ratio: calc(3 * var(--card-w)) / calc(3 * var(--card-h));
+    
+    place-self: center;
     width: 100%;
+    max-width: 100dvh;
     max-height: 100%;
     gap: min(2vmin, 12px);
   }
 
-  /* Switch to 4×3 horizontal when the viewport is decisively wider than tall,
-     or whenever the page hits its max width (desktop). */
-  @media (min-aspect-ratio: 5/4), (min-width: 1000px) {
-    #card-grid {
-      --cols: 4;
-      --rows: 3;
-      --card-w: var(--card-long);
-      --card-h: var(--card-short);
-    }
-  }
+  /* --lane is which row of the 2-3-2 a card sits in, --pos where along it. */
+  .card-slot:nth-child(1) { --lane: 1; --pos: 2; }
+  .card-slot:nth-child(2) { --lane: 1; --pos: 4; }
+  .card-slot:nth-child(3) { --lane: 2; --pos: 1; }
+  .card-slot:nth-child(4) { --lane: 2; --pos: 3; }
+  .card-slot:nth-child(5) { --lane: 2; --pos: 5; }
+  .card-slot:nth-child(6) { --lane: 3; --pos: 2; }
+  .card-slot:nth-child(7) { --lane: 3; --pos: 4; }
 
   .card-slot {
+    grid-row: var(--lane);
+    grid-column: var(--pos) / span 2;
     display: flex;
     flex-direction: column;
     min-height: 0;
+  }
+
+  /* Turn the whole arrangement on its side — lanes become columns of 2-3-2 —
+     when the viewport is decisively wider than tall, or whenever the page hits
+     its max width (desktop). */
+  @media (min-aspect-ratio: 5/4), (min-width: 1000px) {
+    #card-grid {
+      --card-w: var(--card-long);
+      --card-h: var(--card-short);
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(6, 1fr);
+    }
+
+    .card-slot {
+      grid-column: var(--lane);
+      grid-row: var(--pos) / span 2;
+    }
   }
 
   .card-inner {

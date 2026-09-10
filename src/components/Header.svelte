@@ -1,7 +1,6 @@
 <script lang="ts">
   import { app } from '../lib/AppState.svelte';
   import { formatTime } from '../lib/game-utils';
-  import Toast from './Toast.svelte';
 
   let { openMenu, closeMenu }: {
     openMenu: () => void;
@@ -19,7 +18,6 @@
       <span id="deck-count-num">{app.game?.deck.length ?? 0}</span>
     </span>
   </div>
-  <div class="toast-wrapper"><Toast /></div>
   <div class="header-group" class:hidden={!app.gameActive}>
       {#if isDev}
         <button id="skip-btn" title="Skip to end" onclick={() => app.game?.devSkipToEnd()}></button>
@@ -39,13 +37,6 @@
     top: 0;
     z-index: 10;
     gap: 8px;
-  }
-
-  .toast-wrapper {
-    flex: 1;
-    align-self: stretch;
-    position: relative;
-    overflow: visible;
   }
 
   .header-group {

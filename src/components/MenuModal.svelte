@@ -67,14 +67,14 @@
   {:else if view === 'help'}
     <h2 id="modal-title">How to Play</h2>
     <div class="help-text">
-      <p>Find a <strong>proset</strong>: three cards where every colour is solid an even number of times.</p>
+      <p>Find a <strong>proset</strong>: a group of cards where every colour is solid an even number of times.</p>
       <p>Each card has six circles of different colours (red, orange, green, blue, purple, pink). Each circle is either solid or open.</p>
       <ul>
-        <li>Pick a colour, then count the solid circles of that colour across your three cards.</li>
-        <li>The count has to be <strong>0 or 2</strong>.</li>
+        <li>Pick a colour, then count the solid circles of that colour across the cards you have chosen.</li>
+        <li>The count has to be <strong>even</strong>.</li>
         <li>This rule must be satisfied across all 6 colours.</li>
       </ul>
-      <p>Tap three cards to submit a proset. The goal is to clear the entire deck, but be warned: this game is very hard!</p>
+      <p>Tap cards to select them. As soon as you select a proset the cards are taken and replaced. Try to clear the deck as fast as you can!</p>
     </div>
     <button id="play-again-btn" onclick={() => (view = 'main')}>Back</button>
   {:else if view === 'leaderboard'}

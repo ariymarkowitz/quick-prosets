@@ -90,12 +90,6 @@
     animation: pulse-valid 0.3s ease forwards;
   }
 
-  .card.invalid {
-    border-color: var(--invalid) !important;
-    box-shadow: 0 0 0 3px var(--invalid-glow) !important;
-    animation: shake var(--shake-duration, 0.15s) ease forwards;
-  }
-
   .card.hint {
     border-color: var(--hint-highlight) !important;
     box-shadow: 0 0 0 3px var(--hint-glow), 0 5px 14px var(--shadow-hover) !important;
@@ -122,11 +116,5 @@
     0%   { scale: 1; }
     50%  { scale: 1.04; }
     100% { scale: 1; }
-  }
-
-  @keyframes shake {
-    0%, 100% { translate: 0 0; }
-    25%      { translate: -5px 0; }
-    75%      { translate: 5px 0; }
   }
 </style>

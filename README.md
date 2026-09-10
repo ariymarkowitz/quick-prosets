@@ -1,18 +1,18 @@
 # Quick Prosets
 
-A browser-based single-player implementation of the card game ProSet. This is a fork of [Quick Sets](https://github.com/ariymarkowitz/quick-sets). The original app is designed for speedrunning, but ProSet is very hard so good luck.
+A browser-based single-player implementation of the card game ProSet. This is a fork of [Quick Sets](https://github.com/ariymarkowitz/quick-sets). ProSet is much harder than Set, but the reduced deck size in this variation helps balance out some of the difficulty.
 
 ## How to play
 
 Every card has six circles of different colours (red, orange, green, blue, purple and pink). Each circle can be solid or open.
 
-A proset is three cards where every colour is solid an even number of times. With three cards that means each colour has to be solid on exactly zero or two of them.
+A proset is a set of cards where every colour is solid an even number of times.
 
-Click three cards to select them. If they form a valid proset, they're removed and replaced from the deck. If not, you get a brief "Not a proset!" flash and can try again.
+Click on cards to select them. If the selected cards form a proset, they're removed and replaced from the deck.
 
-The deck is the 63 cards with at least one solid circle (the all-open circle cannot be part of a proset of unique cards, since the other two would have to be equal).
+The deck is the 63 cards with at least one solid circle (the all-open circle is not included because it is a proset by itself).
 
-The game ends when there are no prosets among the remaining cards (deck + board combined).
+The game ends when all of the cards are cleared. A property of ProSets is that once the deck is empty, all of the remaining cards together form a proset.
 
 ## Features
 

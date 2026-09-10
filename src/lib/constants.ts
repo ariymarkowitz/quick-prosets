@@ -31,27 +31,25 @@ export const DOT_Y0 = DOT_MARGIN + DOT_OUTER;
 
 export const DEAL_SETTLE_MS = 150;
 
-export const TOAST_MS = 2500;
-
 export const MODE_TIMINGS = {
   speedy: {
     dealDuration: 150, removeDuration: 130, stagger: 20, fastStagger: 20,
-    validFlash: 120, invalidFlash: 180, shakeDuration: 150,
+    validFlash: 120,
   },
   chill: {
     dealDuration: 280, removeDuration: 240, stagger: 100, fastStagger: 20,
-    validFlash: 360, invalidFlash: 340, shakeDuration: 260,
+    validFlash: 360,
   },
 } as const;
-export const BOARD_SIZE = 12;
-export const MIN_BOARD = 3;
+// Seven cards is the smallest board that always contains a proset.
+export const BOARD_SIZE = 7;
 
 export const VICTORY_MESSAGES = [
   "All prosets found!",
   "Mission accomplished!",
   "Victory!",
   "You did it!",
-  "No more prosets!",
+  "Board cleared!",
   "Deck complete!",
   "Congratulations!"
 ]
