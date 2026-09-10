@@ -16,9 +16,12 @@
   {#if app.gameOver?.disqualified}
     <p class="disqualified-note">Hint used — time not saved to leaderboard</p>
   {/if}
-  <h3>Top Times</h3>
+  <div class="board-heading">
+    <h3>Top Times</h3>
+    <p class="board-label">{app.gameOver?.parityUsed ? 'With parity hint' : 'No parity hint'}</p>
+  </div>
   <ol id="leaderboard-list">
-    {#each app.scores as s, i}
+    {#each app.gameOver?.parityUsed ? app.scores.parity : app.scores.plain as s, i}
       <li class:current-score={i === app.gameOver?.currentIdx}>
         {i + 1}. {formatTime(s)}
       </li>
@@ -36,6 +39,18 @@
     font-variant-numeric: tabular-nums;
 
     margin-top: var(--time-margin-top);
+  }
+
+  .board-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .board-label {
+    margin-top: 0;
+    font-size: 0.85rem;
+    color: var(--text-muted);
   }
 
   /* Sits on the modal's own flex gap, so it opts out of the global p + p rule. */

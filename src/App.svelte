@@ -9,9 +9,7 @@
   import { getScores, getMode, setMode, getStoredTheme, setTheme, getShowParity, setShowParity, saveScore as persistScore } from './lib/storage';
   import { VICTORY_MESSAGES, CARD_W, CARD_H } from './lib/constants';
 
-  // The grid cell has to be the same shape as the card viewBox, or
-  // preserveAspectRatio letterboxes the SVG and the margins stop being equal.
-  // Set during init so the values are in place before CardGrid first renders.
+  // Make the grid cell the same shape as the card viewBox.
   document.documentElement.style.setProperty('--card-short', String(CARD_W));
   document.documentElement.style.setProperty('--card-long', String(CARD_H));
 
@@ -29,13 +27,15 @@
     app.game = new Game({
       getRunning: () => app.running,
       getCardsExiting: () => app.cardsExiting,
+      getShowParity: () => app.showParity,
       getAnimSettings: () => app.animSettings,
-      onEndGame: ({ time, disqualified }) => {
+      onEndGame: ({ time, disqualified, parityUsed }) => {
         const title = VICTORY_MESSAGES[Math.floor(Math.random() * VICTORY_MESSAGES.length)]!;
-        const scores = disqualified ? getScores() : persistScore(time);
-        const currentIdx = disqualified ? -1 : scores.indexOf(time);
+        const scores = disqualified ? getScores() : persistScore(time, parityUsed);
+        const board = parityUsed ? scores.parity : scores.plain;
+        const currentIdx = disqualified ? -1 : board.indexOf(time);
         app.scores = scores;
-        app.phase = { kind: 'over', info: { title, time, currentIdx, disqualified } };
+        app.phase = { kind: 'over', info: { title, time, currentIdx, disqualified, parityUsed } };
       },
     });
     return () => { app.game = null; };

@@ -1,8 +1,14 @@
-export type Theme = 'light' | 'dark';
 import type { GameMode } from './Game.svelte.js';
+
+export type Theme = 'light' | 'dark';
+
+// The two leaderboards, depending on whether the parity hint was ever visible
+// during the game.
+export type Scores = { plain: number[]; parity: number[] };
 
 const THEME_KEY = 'proset-game-theme';
 const SCORES_KEY = 'proset-game-scores';
+const PARITY_SCORES_KEY = 'proset-game-scores-parity';
 const MODE_KEY = 'proset-game-mode';
 const PARITY_KEY = 'proset-game-parity';
 
@@ -26,27 +32,32 @@ export function setMode(mode: GameMode): void {
   localStorage.setItem(MODE_KEY, mode);
 }
 
+// Parity hint is on by default.
 export function getShowParity(): boolean {
-  return localStorage.getItem(PARITY_KEY) === 'true';
+  return localStorage.getItem(PARITY_KEY) !== 'false';
 }
 
 export function setShowParity(show: boolean): void {
   localStorage.setItem(PARITY_KEY, String(show));
 }
 
-export function getScores(): number[] {
-  const raw = localStorage.getItem(SCORES_KEY);
+export function getScores(): Scores {
+  return { plain: readScores(SCORES_KEY), parity: readScores(PARITY_SCORES_KEY) };
+}
+
+export function saveScore(seconds: number, parityUsed: boolean): Scores {
+  const key = parityUsed ? PARITY_SCORES_KEY : SCORES_KEY;
+  const scores = readScores(key);
+  scores.push(seconds);
+  scores.sort((a, b) => a - b);
+  localStorage.setItem(key, JSON.stringify(scores.slice(0, 5)));
+  return getScores();
+}
+
+function readScores(key: string): number[] {
+  const raw = localStorage.getItem(key);
   if (!raw) return [];
   const parsed: unknown = JSON.parse(raw);
   if (!Array.isArray(parsed)) return [];
   return parsed.filter((x): x is number => typeof x === 'number');
-}
-
-export function saveScore(seconds: number): number[] {
-  const scores = getScores();
-  scores.push(seconds);
-  scores.sort((a, b) => a - b);
-  const capped = scores.slice(0, 5);
-  localStorage.setItem(SCORES_KEY, JSON.stringify(capped));
-  return capped;
 }

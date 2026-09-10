@@ -13,6 +13,10 @@
   type View = 'main' | 'help' | 'leaderboard' | 'parity';
   let view: View = $state('main');
 
+  // The chosen board lives on `app`, so it is remembered across openings for as
+  // long as the page is open.
+  const shownScores = $derived(app.scores[app.leaderboardBoard]);
+
   function onThemeToggle() {
     app.theme = app.theme === 'dark' ? 'light' : 'dark';
   }
@@ -60,13 +64,13 @@
         aria-checked={app.showParity}
         onclick={() => (app.showParity = !app.showParity)}
       >
-        Show parity card
+        Show parity hint
         <span class="switch" aria-hidden="true"></span>
       </button>
       <button
         class="menu-btn icon-btn"
-        aria-label="What is the parity card?"
-        title="What is the parity card?"
+        aria-label="What is the parity hint?"
+        title="What is the parity hint?"
         onclick={() => (view = 'parity')}
       ><span class="help-icon"></span></button>
     </div>
@@ -98,27 +102,47 @@
     </div>
     <button id="play-again-btn" onclick={() => (view = 'main')}>Back</button>
   {:else if view === 'parity'}
-    <h2 id="modal-title">Parity Card</h2>
+    <h2 id="modal-title">Parity Hint</h2>
     <div class="help-text">
-      <p>The parity card is a ghost card above the board that tracks the cards you have selected.</p>
+      <p>The parity hint is a ghost card above the board that tracks the cards you have selected.</p>
       <p>
         A circle will be <strong>solid</strong> if it appears solid an odd number of times among the selected cards.
         Otherwise it will be <strong>open</strong>.
       </p>
       <p>
-        The parity card is exactly the card that would complete your selection into a proset.
+        The parity hint is exactly the card that would complete your selection into a proset.
         Once every circle is open, the cards you have selected are a proset.
       </p>
-      <p>There is a separate leaderboard for games where the parity card was not used—it makes the game much harder!</p>
+      <p>
+        Games where the parity hint was viewed are in a separate leaderboard to games where it wasn't viewed.
+        Without the parity hint, the game is much harder!
+      </p>
     </div>
     <button id="play-again-btn" onclick={() => (view = 'main')}>Back</button>
   {:else if view === 'leaderboard'}
     <h2 id="modal-title">Top Times</h2>
-    {#if app.scores.length === 0}
-      <p class="empty-scores">No times yet — finish a game to set a record.</p>
+    <div class="segmented thin" role="group" aria-label="Leaderboard">
+      <button
+          type="button"
+          class="segmented-btn"
+          class:active={app.leaderboardBoard === 'parity'}
+          onclick={() => (app.leaderboardChoice = 'parity')}
+      >With parity hint</button>
+      <button
+        type="button"
+        class="segmented-btn"
+        class:active={app.leaderboardBoard === 'plain'}
+        onclick={() => (app.leaderboardChoice = 'plain')}
+      >No parity hint</button>
+    </div>
+    {#if shownScores.length === 0}
+      <p class="empty-scores">
+        No times yet — finish a game
+        {app.leaderboardBoard === 'parity' ? 'with the parity hint' : 'without the parity hint'} to set a record.
+      </p>
     {:else}
       <ol id="leaderboard-list">
-        {#each app.scores as s, i}
+        {#each shownScores as s, i}
           <li>{i + 1}. {formatTime(s)}</li>
         {/each}
       </ol>
@@ -176,6 +200,19 @@
   .rabbit-icon {
     -webkit-mask: url('../icons/mdi--rabbit.svg') no-repeat center / contain;
     mask: url('../icons/mdi--rabbit.svg') no-repeat center / contain;
+  }
+
+  /* Reads as a caption on the list below it, so it sits tight under the title
+     rather than on the modal's full stack gap. */
+  .segmented.thin {
+    margin-top: calc(var(--modal-gap) * -0.6);
+    border-radius: var(--radius-sm);
+  }
+
+  .segmented.thin .segmented-btn {
+    flex: 1;
+    padding: 2px 14px;
+    font-size: var(--fs-xs);
   }
 
   .segmented-btn + .segmented-btn {

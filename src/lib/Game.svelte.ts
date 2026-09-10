@@ -25,6 +25,7 @@ export type GameOverInfo = {
   time: number;
   currentIdx: number;
   disqualified: boolean;
+  parityUsed: boolean;
 };
 
 export type GameMode = 'chill' | 'speedy';
@@ -40,8 +41,9 @@ type Resolution =
 export type GameDeps = {
   getRunning: () => boolean;
   getCardsExiting: () => boolean;
+  getShowParity: () => boolean;
   getAnimSettings: () => AnimSettings;
-  onEndGame: (result: { time: number; disqualified: boolean }) => void;
+  onEndGame: (result: { time: number; disqualified: boolean; parityUsed: boolean }) => void;
 };
 
 let nextId = 0;
@@ -53,6 +55,8 @@ export class Game {
   board: BoardEntry[] = $state([]);
   prosetsFound: number = $state(0);
   hintsUsed: boolean = $state(false);
+  // True if the parity hint was ever visible during the game.
+  parityUsed: boolean = $state(false);
 
   // Interaction
   selectedIds: number[] = $state([]);
@@ -71,15 +75,17 @@ export class Game {
     this.selectedIds.map(id => this.board.find(e => e.id === id)?.card ?? 0)
   );
 
-  // The selection's parity, as a card: solid where that colour is currently
-  // solid an odd number of times. It blanks out exactly when the selection is a
-  // proset, and until then it is the card that would complete one.
+  // The card that would complete the proset.
   parity = $derived(xorOf(this.selectedCards));
 
   #deps: GameDeps;
 
   constructor(deps: GameDeps) {
     this.#deps = deps;
+
+    $effect(() => {
+      if (this.#deps.getRunning() && this.#deps.getShowParity()) this.parityUsed = true;
+    });
 
     $effect(() => {
       const r = this.resolution;
@@ -248,6 +254,6 @@ export class Game {
   #endGame(): void {
     const time = this.timer.sample;
     const disqualified = this.hintsUsed;
-    this.#deps.onEndGame({ time, disqualified });
+    this.#deps.onEndGame({ time, disqualified, parityUsed: this.parityUsed });
   }
 }

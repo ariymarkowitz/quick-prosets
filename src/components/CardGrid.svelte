@@ -102,8 +102,7 @@
     min-height: 0;
   }
 
-  /* The parity card takes a full lane of its own in front of the 2-3-2, which
-     makes it exactly the size of a real card. */
+  /* The parity hint takes a full lane of its own. */
   #card-grid.with-parity {
     --row-shift: 1;
     grid-template-rows: repeat(4, 1fr);
