@@ -34,7 +34,7 @@
     .card-svg {
       width: 100cqh;
       height: 100cqw;
-      transform: rotate(90deg);
+      transform: rotate(-90deg);
     }
   }
 </style>

@@ -122,33 +122,12 @@
     flex: 1;
   }
 
-  /* Turn the whole arrangement on its side — lanes become columns of 2-3-2 —
-     when the viewport is decisively wider than tall, or whenever the page hits
+  /* Rotate the card aspect ratio about when the cards will be wider than they are tall, or whenever the page hits
      its max width (desktop). */
-  @media (min-aspect-ratio: 5/4), (min-width: 1000px) {
+  @media (min-aspect-ratio: 4/5), (min-width: 1000px) {
     #card-grid {
       --card-w: var(--card-long);
       --card-h: var(--card-short);
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(6, 1fr);
-    }
-
-    .card-slot {
-      grid-column: var(--lane);
-      grid-row: calc(var(--pos) + var(--row-shift)) / span 2;
-    }
-
-    /* The board turns on its side; the parity card stays above it. Lanes run
-       across now, and the rows it has to clear are half-cards, hence two. */
-    #card-grid.with-parity {
-      --row-shift: 2;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(8, 1fr);
-    }
-
-    .parity-slot {
-      grid-column: 2;
-      grid-row: 1 / span 2;
     }
   }
 
