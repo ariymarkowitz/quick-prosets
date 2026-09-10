@@ -1,6 +1,6 @@
 <script lang="ts">
   import {
-    CARD_W, CARD_H, DOT_COLS, DOT_R, DOT_X0, DOT_Y0, DOT_SPACING,
+    CARD_W, CARD_H, DOT_COLS, DOT_R, DOT_STROKE, DOT_X0, DOT_Y0, DOT_SPACING,
   } from '../lib/constants';
   import { app } from '../lib/AppState.svelte';
   import type { Highlight } from '../lib/Game.svelte';
@@ -40,6 +40,7 @@
         cx={DOT_X0 + (i % DOT_COLS) * DOT_SPACING}
         cy={DOT_Y0 + Math.floor(i / DOT_COLS) * DOT_SPACING}
         r={DOT_R}
+        stroke-width={DOT_STROKE}
         class="dot color-{color} {isSolid(card, i) ? 'solid' : 'open'}"
       />
     {/each}
@@ -56,7 +57,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 3%;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
     box-shadow: 0 2px 8px var(--shadow);

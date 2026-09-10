@@ -62,8 +62,8 @@
   #card-grid {
     --cols: 3;
     --rows: 4;
-    --card-w: 5;
-    --card-h: 8;
+    --card-w: var(--card-short);
+    --card-h: var(--card-long);
     display: grid;
     grid-template-columns: repeat(var(--cols), 1fr);
     grid-template-rows: repeat(var(--rows), 1fr);
@@ -79,8 +79,8 @@
     #card-grid {
       --cols: 4;
       --rows: 3;
-      --card-w: 8;
-      --card-h: 5;
+      --card-w: var(--card-long);
+      --card-h: var(--card-short);
     }
   }
 

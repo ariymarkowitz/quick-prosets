@@ -1,15 +1,33 @@
-export const CARD_W = 100;
-export const CARD_H = 160;
+// ─── Card geometry ──────────────────────────────────────────────────────────
+// Tune these four. Everything below them is derived, including the card's own
+// aspect ratio, which is what keeps the margin equal on all four sides.
+// The units are arbitrary — only the ratios between these numbers matter.
+export const DOT_R = 10;       // circle radius, measured to the middle of the stroke
+export const DOT_STROKE = 2;   // an open circle strokes where a solid one fills
+export const DOT_GAP = 14;     // space between neighbouring circle edges
+export const DOT_MARGIN = 14;   // space between the outermost circle edges and the card edge
 
 // The six circles sit in a fixed 2×3 grid, one slot per colour. Positions never
 // change, so a colour is identified by where it is as much as by its hue.
 export const DOT_COLS = 2;
 export const DOT_ROWS = 3;
-export const DOT_R = 16;
-// One spacing for both axes, so the gaps read the same horizontally and vertically.
-export const DOT_SPACING = 52;
-export const DOT_X0 = (CARD_W - (DOT_COLS - 1) * DOT_SPACING) / 2;
-export const DOT_Y0 = (CARD_H - (DOT_ROWS - 1) * DOT_SPACING) / 2;
+
+// A stroked circle overhangs its radius by half the stroke width.
+const DOT_OUTER = DOT_R + DOT_STROKE / 2;
+
+// Centre to centre, the same on both axes so the gaps read alike.
+export const DOT_SPACING = 2 * DOT_OUTER + DOT_GAP;
+
+// The card viewBox is the circle group plus DOT_MARGIN all round, and the grid
+// takes its cell shape from these two numbers (App.svelte publishes them as
+// --card-short / --card-long). Because the cell and the viewBox then share an
+// aspect ratio, preserveAspectRatio has nothing to letterbox — so DOT_MARGIN is
+// the margin you actually see, on every side.
+export const CARD_W = (DOT_COLS - 1) * DOT_SPACING + 2 * DOT_OUTER + 2 * DOT_MARGIN;
+export const CARD_H = (DOT_ROWS - 1) * DOT_SPACING + 2 * DOT_OUTER + 2 * DOT_MARGIN;
+
+export const DOT_X0 = DOT_MARGIN + DOT_OUTER;
+export const DOT_Y0 = DOT_MARGIN + DOT_OUTER;
 
 export const DEAL_SETTLE_MS = 150;
 

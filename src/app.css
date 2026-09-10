@@ -258,7 +258,6 @@ button:active {
 .dot {
   fill: none;
   stroke: var(--dot-color);
-  stroke-width: 4;
 }
 
 .dot.solid {

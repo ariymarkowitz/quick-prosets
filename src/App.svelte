@@ -7,7 +7,13 @@
   import { app } from './lib/AppState.svelte';
   import { Game } from './lib/Game.svelte';
   import { getScores, getMode, setMode, getStoredTheme, setTheme, saveScore as persistScore } from './lib/storage';
-  import { VICTORY_MESSAGES } from './lib/constants';
+  import { VICTORY_MESSAGES, CARD_W, CARD_H } from './lib/constants';
+
+  // The grid cell has to be the same shape as the card viewBox, or
+  // preserveAspectRatio letterboxes the SVG and the margins stop being equal.
+  // Set during init so the values are in place before CardGrid first renders.
+  document.documentElement.style.setProperty('--card-short', String(CARD_W));
+  document.documentElement.style.setProperty('--card-long', String(CARD_H));
 
   app.scores = getScores();
   app.mode = getMode();
