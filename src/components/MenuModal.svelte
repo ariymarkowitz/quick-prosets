@@ -68,13 +68,13 @@
     <h2 id="modal-title">How to Play</h2>
     <div class="help-text">
       <p>Find a <strong>proset</strong>: three cards where every colour is solid an even number of times.</p>
-      <p>Each card shows the same six circles — red, orange, green, blue, purple, pink — and each one is either solid or open.</p>
+      <p>Each card has six circles of different colours (red, orange, green, blue, purple, pink). Each circle is either solid or open.</p>
       <ul>
         <li>Pick a colour, then count the solid circles of that colour across your three cards.</li>
-        <li>The count has to be <strong>0 or 2</strong> — never 1 or 3.</li>
-        <li>All six colours must work out at once.</li>
+        <li>The count has to be <strong>0 or 2</strong>.</li>
+        <li>This rule must be satisfied across all 6 colours.</li>
       </ul>
-      <p>Tap three cards to submit a proset. Clear the deck as fast as you can.</p>
+      <p>Tap three cards to submit a proset. The goal is to clear the entire deck, but be warned: this game is very hard!</p>
     </div>
     <button id="play-again-btn" onclick={() => (view = 'main')}>Back</button>
   {:else if view === 'leaderboard'}
