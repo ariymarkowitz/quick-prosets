@@ -29,3 +29,4 @@ Before writing or restructuring reactive code ($state/$derived/$effect, classes 
 - `app.phase` is the single source of truth for lifecycle. Derive from it rather than adding parallel booleans.
 - Transitions are state-driven: the child owns its animation and fires a done callback; the parent never times the child.
 - A 7-card board always contains a proset, and whatever is left when the deck empties is a proset itself — the game cannot deadlock, so there is deliberately no reshuffle or no-moves handling.
+- `CLAUDE.md` should only contain instructions, guidelines, and file locations.
