@@ -36,6 +36,16 @@
     mix-blend-mode: multiply;
     transition: opacity var(--dur-quick) ease;
     opacity: 0.8;
+    animation: parityIn var(--deal-duration) ease backwards;
+  }
+
+  @keyframes parityIn {
+    from { opacity: 0; }
+    to { opacity: 0.8; }
+  }
+
+  .parity-card :global(.dot) {
+    transition: fill var(--dur-fast) ease, opacity var(--dur-fast) ease;
   }
 
   :global(body.dark) .parity-card {

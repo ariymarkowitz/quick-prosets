@@ -50,6 +50,7 @@
   --fs-sm: 0.9rem;
   --fs-md: 1rem;
 
+  --dur-fast: 0.08s;
   --dur-quick: 0.15s;
   --dur-slow: 0.3s;
 
