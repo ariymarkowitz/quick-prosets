@@ -202,10 +202,8 @@
     mask: url('../icons/mdi--rabbit.svg') no-repeat center / contain;
   }
 
-  /* Reads as a caption on the list below it, so it sits tight under the title
-     rather than on the modal's full stack gap. */
   .segmented.thin {
-    margin-top: calc(var(--modal-gap) * -0.6);
+    flex-shrink: 0;
     border-radius: var(--radius-sm);
   }
 
