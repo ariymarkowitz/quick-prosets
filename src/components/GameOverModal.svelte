@@ -38,7 +38,9 @@
     margin-top: var(--time-margin-top);
   }
 
+  /* Sits on the modal's own flex gap, so it opts out of the global p + p rule. */
   .disqualified-note {
+    margin-top: 0;
     font-size: 0.85rem;
     color: var(--text-muted);
   }

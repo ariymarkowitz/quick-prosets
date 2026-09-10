@@ -10,7 +10,7 @@
     onModalClosed: () => void;
   } = $props();
 
-  type View = 'main' | 'help' | 'leaderboard';
+  type View = 'main' | 'help' | 'leaderboard' | 'parity';
   let view: View = $state('main');
 
   function onThemeToggle() {
@@ -51,17 +51,25 @@
       ><span class="theme-icon"></span></button>
     </div>
 
-    <button
-      type="button"
-      class="option-row"
-      class:active={app.showParity}
-      role="switch"
-      aria-checked={app.showParity}
-      onclick={() => (app.showParity = !app.showParity)}
-    >
-      Parity card
-      <span class="switch" aria-hidden="true"></span>
-    </button>
+    <div class="menu-row">
+      <button
+        type="button"
+        class="option-row"
+        class:active={app.showParity}
+        role="switch"
+        aria-checked={app.showParity}
+        onclick={() => (app.showParity = !app.showParity)}
+      >
+        Show parity card
+        <span class="switch" aria-hidden="true"></span>
+      </button>
+      <button
+        class="menu-btn icon-btn"
+        aria-label="What is the parity card?"
+        title="What is the parity card?"
+        onclick={() => (view = 'parity')}
+      ><span class="help-icon"></span></button>
+    </div>
 
     <div class="menu-row">
       <button class="menu-btn" onclick={() => (view = 'help')}>How to Play</button>
@@ -87,7 +95,21 @@
         <li>This rule must be satisfied across all 6 colours.</li>
       </ul>
       <p>Tap cards to select them. As soon as you select a proset the cards are taken and replaced. Try to clear the deck as fast as you can!</p>
-      <p>The <strong>parity card</strong> option puts a faded card above the board showing which colours are still odd. Empty it and you have a proset.</p>
+    </div>
+    <button id="play-again-btn" onclick={() => (view = 'main')}>Back</button>
+  {:else if view === 'parity'}
+    <h2 id="modal-title">Parity Card</h2>
+    <div class="help-text">
+      <p>The parity card is a ghost card above the board that tracks the cards you have selected.</p>
+      <p>
+        A circle will be <strong>solid</strong> if it appears solid an odd number of times among the selected cards.
+        Otherwise it will be <strong>open</strong>.
+      </p>
+      <p>
+        The parity card is exactly the card that would complete your selection into a proset.
+        Once every circle is open, the cards you have selected are a proset.
+      </p>
+      <p>There is a separate leaderboard for games where the parity card was not used—it makes the game much harder!</p>
     </div>
     <button id="play-again-btn" onclick={() => (view = 'main')}>Back</button>
   {:else if view === 'leaderboard'}
@@ -172,6 +194,7 @@
 
   /* A labelled switch, sized to sit in the same stack as the menu buttons. */
   .option-row {
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -232,6 +255,15 @@
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  .help-icon {
+    display: inline-block;
+    width: 1.4em;
+    height: 1.4em;
+    background-color: var(--text-muted);
+    -webkit-mask: url('../icons/mdi--help-circle-outline.svg') no-repeat center / contain;
+    mask: url('../icons/mdi--help-circle-outline.svg') no-repeat center / contain;
   }
 
   .theme-icon {

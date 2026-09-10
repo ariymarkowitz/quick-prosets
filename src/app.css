@@ -95,6 +95,10 @@ body.dark {
   padding: 0;
 }
 
+p + p {
+  margin-top: 10px;
+}
+
 .hidden-svg {
   position: absolute;
   width: 0;
