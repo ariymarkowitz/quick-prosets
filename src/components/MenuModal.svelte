@@ -64,7 +64,7 @@
         aria-checked={app.showParity}
         onclick={() => (app.showParity = !app.showParity)}
       >
-        Show parity hint
+        <span class="parity-label">Show Parity Hint</span>
         <span
           class="parity-switch"
           class:solid={app.showParity}
@@ -238,7 +238,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-    padding: 9px 12px;
+    padding: 9px 10px;
     border-radius: var(--radius-md);
     font-size: var(--fs-sm);
     font-weight: 600;
@@ -249,11 +249,10 @@
     color: var(--text);
   }
 
-  /* On is a solid circle, off is an open one — the same two states a card's
-     circles have, in the same proportions: a card circle is 22 units across and
-     strokes 2 of them. .color-purple, which sets --dot-color, is global. Unlike
-     a card dot, the fill sits inset from the stroke with a visible gap, radio-
-     button style, so the ring stays legible in both states. */
+  .parity-label {
+    flex: 1;
+  }
+
   .parity-switch {
     --switch-size: 20px;
     --switch-gap: 2px;
