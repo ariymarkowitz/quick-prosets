@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg viewBox="0 0 200 200" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <rect width="185" height="185" x="7.5" y="7.5" rx="40"
+        style="fill:#ffffff;stroke:#d2d2d2;stroke-width:15" />
+  <!-- One card of the deck: purple, red and blue solid; green, pink and orange open. -->
+  <g fill="none" stroke-width="6">
+    <circle cx="52"  cy="76"  r="20" stroke="#8256cf" fill="#8256cf" />
+    <circle cx="100" cy="76"  r="20" stroke="#2d9a4e" />
+    <circle cx="148" cy="76"  r="20" stroke="#e63946" fill="#e63946" />
+    <circle cx="52"  cy="124" r="20" stroke="#d6459b" />
+    <circle cx="100" cy="124" r="20" stroke="#2f7fd8" fill="#2f7fd8" />
+    <circle cx="148" cy="124" r="20" stroke="#e07a12" />
+  </g>
+</svg>
