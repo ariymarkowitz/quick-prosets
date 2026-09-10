@@ -25,7 +25,7 @@
 
 <Modal open={app.canShowModal && app.menuOpen} onOpen={onModalOpened} {onClose}>
   {#if view === 'main'}
-    <h2 id="modal-title">Quick Prosets</h2>
+    <h2 id="modal-title">Quick <span class="brand-pro">Pro</span>sets</h2>
 
     <div class="menu-row">
       <div class="segmented" role="group" aria-label="Game mode">
@@ -93,6 +93,11 @@
 </Modal>
 
 <style>
+
+  /* Fixed, not themed like --dot-orange — this orange stays the same in light and dark. */
+  .brand-pro {
+    color: #e47503;
+  }
 
   .segmented {
     display: flex;

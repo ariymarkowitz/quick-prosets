@@ -32,10 +32,10 @@
   --card-radius: 16px;
 
   --dot-red:    #e63946;
-  --dot-orange: #e07a12;
+  --dot-orange: #e47503;
   --dot-green:  #2d9a4e;
   --dot-blue:   #2f7fd8;
-  --dot-purple: #8256cf;
+  --dot-purple: #845dc8;
   --dot-pink:   #d6459b;
 
   --modal-padding: 30px 28px;
@@ -80,12 +80,12 @@ body.dark {
   --card-bg: #1e2040;
   --card-border: #2a2d52;
 
-  --dot-red:    #f4606c;
-  --dot-orange: #f0993a;
-  --dot-green:  #45c172;
-  --dot-blue:   #5aa2f0;
-  --dot-purple: #a481ea;
-  --dot-pink:   #ec6cb4;
+  --dot-red: #ed3e4c;
+  --dot-orange: #ef800c;
+  --dot-green: #2cb75f;
+  --dot-blue: #3691f2;
+  --dot-purple: #8456e2;
+  --dot-pink: #e645a0;
   --shadow-strong: rgba(0, 0, 0, 0.6);
 }
 
@@ -256,7 +256,7 @@ button:active {
  ──────────────────────────────────────────────────────────────────────────── */
 
 .dot {
-  fill: none;
+  fill: color-mix(in srgb, var(--dot-color) 15%, transparent);
   stroke: var(--dot-color);
 }
 
