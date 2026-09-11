@@ -17,8 +17,8 @@ The game ends when all of the cards are cleared. A property of ProSets is that o
 ## Features
 
 - Light/dark theme toggle
-- Different UI speeds for casual play and speedrunning
-- Hints for when you are stuck or a cheater
+- A 'parity hint' that shows which colours your selection clears.
+- Hints for when you are stuck
 - Top 5 leaderboard saved locally
 - Works well on mobile browsers
 - The cards orient vertically in portrait mode, and horizontally in landscape mode
