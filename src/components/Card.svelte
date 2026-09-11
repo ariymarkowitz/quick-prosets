@@ -85,8 +85,8 @@
   }
 
   @keyframes pulse-valid {
-    0%   { scale: 1; }
-    50%  { scale: 1.04; }
+    0%   { scale: 1; animation-timing-function: ease-out; }
+    45%  { scale: 1.04; animation-timing-function: ease-out; }
     100% { scale: 1; }
   }
 </style>
