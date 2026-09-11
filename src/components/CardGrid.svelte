@@ -136,6 +136,10 @@
   /* Rotate the card aspect ratio about when the cards will be wider than they are tall, or whenever the page hits
      its max width (desktop). */
   @media (min-aspect-ratio: 4/5), (min-width: 1000px) {
+    #card-grid-wrap {
+      padding-bottom: min(60px, 10dvh);
+    }
+
     #card-grid {
       --card-w: var(--card-long);
       --card-h: var(--card-short);

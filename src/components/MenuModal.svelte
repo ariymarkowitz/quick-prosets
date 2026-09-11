@@ -114,13 +114,13 @@
           class="segmented-btn"
           class:active={app.leaderboardBoard === 'parity'}
           onclick={() => (app.leaderboardChoice = 'parity')}
-      >With parity hint</button>
+      >With Parity Hint</button>
       <button
         type="button"
         class="segmented-btn"
         class:active={app.leaderboardBoard === 'plain'}
         onclick={() => (app.leaderboardChoice = 'plain')}
-      >No parity hint</button>
+      >No Parity Hint</button>
     </div>
     {#if shownScores.length === 0}
       <p class="empty-scores">
