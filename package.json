@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:status": "found=$(for pid in $(pgrep -f \"$PWD/node_modules/.bin/vite\"); do lsof -nP -a -p \"$pid\" -iTCP -sTCP:LISTEN | awk 'NR>1 { sub(/.*:/, \"\", $9); print \"http://localhost:\" $9 \"  (pid \" $2 \")\" }'; done); [ -n \"$found\" ] && echo \"$found\" || echo 'No dev servers running for this project'",
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
