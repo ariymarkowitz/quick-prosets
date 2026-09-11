@@ -2,7 +2,8 @@
 <!-- Source for public/og-image.png. Render with:
      rsvg-convert -w 1200 -h 630 raw/og-image.svg -o public/og-image.png
      The card is one real deck card (purple, red and blue solid) in the landscape
-     orientation the board uses on wide screens. -->
+     orientation the board uses on wide screens, widened to 10:6.
+     raw/og-image-16x9.svg is the same image with the viewBox cropped to 16:9. -->
 <svg width="1200" height="630" viewBox="0 0 1200 630" version="1.1" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <pattern id="paper" width="350" height="350" patternUnits="userSpaceOnUse">
@@ -17,7 +18,7 @@
   <rect width="1200" height="630" fill="url(#paper)" />
 
   <g transform="rotate(180 600 315)">
-    <rect x="238.25" y="60" width="723.5" height="510" rx="39"
+    <rect x="175" y="60" width="850" height="510" rx="39"
           fill="#ffffff" stroke="#7f52c3" stroke-width="9" filter="url(#card-shadow)" />
 
     <!-- Open dots carry the same styling as .dot.open (app.css): a 15%-opacity
