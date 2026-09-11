@@ -36,7 +36,8 @@ type Resolution =
   | null
   | { stage: 'flash'; ids: number[] }
   | { stage: 'removing'; ids: number[]; stagger: number }
-  | { stage: 'dealing'; ids: number[] };
+  // Either refilling the gaps a proset left, or laying out a whole board.
+  | { stage: 'dealing'; ids: number[]; refill: boolean };
 
 export type GameDeps = {
   getRunning: () => boolean;
@@ -54,9 +55,6 @@ export class Game {
   deck: Card[] = $state([]);
   board: BoardEntry[] = $state([]);
   prosetsFound: number = $state(0);
-  // Counted the moment a selection becomes a proset, ahead of its flash, and
-  // never taken back — so it can key a celebration that outlasts the pipeline.
-  prosetsClaimed: number = $state(0);
   hintsUsed: boolean = $state(false);
   // True if the parity hint was ever visible during the game.
   parityUsed: boolean = $state(false);
@@ -73,6 +71,10 @@ export class Game {
 
   activeEntries = $derived(this.board.filter(e => e.card !== null));
   animating = $derived(this.resolution !== null);
+  // From the moment a proset is claimed until the cards that replace it land.
+  resolvingProset = $derived(
+    this.resolution !== null && (this.resolution.stage !== 'dealing' || this.resolution.refill)
+  );
 
   selectedCards = $derived(
     this.selectedIds.map(id => this.board.find(e => e.id === id)?.card ?? 0)
@@ -103,7 +105,7 @@ export class Game {
           this.resolution = { stage: 'removing', ids: r.ids, stagger: animSettings.stagger };
         } else if (r.stage === 'removing') {
           for (const e of this.board) if (r.ids.includes(e.id)) e.card = null;
-          this.#topUp();
+          this.#topUp(true);
           if (this.resolution === null) this.#checkBoard();
         } else {
           this.resolution = null;
@@ -151,7 +153,7 @@ export class Game {
   }
 
   triggerResumeDeal(): void {
-    this.resolution = { stage: 'dealing', ids: this.activeEntries.map(e => e.id) };
+    this.resolution = { stage: 'dealing', ids: this.activeEntries.map(e => e.id), refill: false };
   }
 
   // --- Actions ---
@@ -173,7 +175,6 @@ export class Game {
     // The selection is claimed the moment it becomes a proset — of any size,
     // so there is nothing to submit and no wrong answer to reject.
     if (isValidProset(this.selectedCards)) {
-      this.prosetsClaimed += 1;
       this.resolution = { stage: 'flash', ids: this.selectedIds };
     }
   }
@@ -234,7 +235,7 @@ export class Game {
     if (this.deck.length === 0 && this.activeEntries.length === 0) this.#endGame();
   }
 
-  #topUp(): void {
+  #topUp(refill: boolean): void {
     const ids: number[] = [];
     for (const e of this.board) {
       if (e.card !== null) continue;
@@ -247,12 +248,12 @@ export class Game {
       this.board.push(e);
       ids.push(e.id);
     }
-    this.resolution = ids.length > 0 ? { stage: 'dealing', ids } : null;
+    this.resolution = ids.length > 0 ? { stage: 'dealing', ids, refill } : null;
   }
 
   #dealFreshBoard(): void {
     this.board = [];
-    this.#topUp();
+    this.#topUp(false);
   }
 
   #endGame(): void {

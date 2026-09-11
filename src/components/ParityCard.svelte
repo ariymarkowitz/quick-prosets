@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { untrack } from 'svelte';
   import { app } from '../lib/AppState.svelte';
   import { COLORS, isSolid } from '../lib/game-utils';
   import CardFace from './CardFace.svelte';
@@ -15,54 +14,33 @@
     odd.length === 0 ? 'Every colour even' : `Odd so far: ${odd.join(', ')}`
   );
 
-  // The circles wave in as the board is dealt and out as it clears, with the
-  // success wash in between. One wave at a time: a circle has one animation.
-  let entered = $state(false);
-  // The wash runs on its own clock rather than the pipeline's, so it holds
-  // until its circles are back. Counting from mount means a card that appears
-  // mid-game doesn't replay the last proset.
-  const claimed = $derived(app.game?.prosetsClaimed ?? 0);
-  let wavedFor = $state(untrack(() => claimed));
-  const wave = $derived(
-    app.cardsExiting ? 'out'
-    : !entered ? 'in'
-    : claimed > wavedFor && app.mode === 'chill' ? 'out-in'
-    : null
-  );
+  // The circles are shown unless the board is clearing, and transition between
+  // the two. The wash plays while a proset resolves; clicks are ignored until
+  // that ends, so the class always comes off before the next proset.
+  const washing = $derived(app.mode === 'chill' && (app.game?.resolvingProset ?? false));
 
-  let ink: HTMLDivElement;
+  // Report once every circle has waved out.
+  let root: HTMLDivElement;
   $effect(() => {
-    const current = wave;
-    if (current === null) return;
-    let live = true;
-    Promise.all(ink.getAnimations({ subtree: true }).map(a => a.finished)).then(
-      () => {
-        if (!live) return;
-        if (current === 'in') entered = true;
-        else if (current === 'out') onExited();
-        // Read now, not at the start: a proset claimed mid-wash folds into it
-        // instead of leaving the wash waiting on one that never starts.
-        else wavedFor = app.game?.prosetsClaimed ?? 0;
-      },
-      // Cut short by the next wave, which reports for itself.
+    if (!app.cardsExiting) return;
+    Promise.all(root.getAnimations({ subtree: true }).map(a => a.finished)).then(
+      () => onExited(),
       () => {}
     );
-    return () => { live = false; };
   });
 </script>
 
 <div
+  bind:this={root}
   class="parity-card"
   role="img"
   aria-label={label}
   title={label}
 >
   <div
-    bind:this={ink}
     class="parity-ink"
-    class:wave-in={wave === 'in'}
-    class:wave-out-in={wave === 'out-in'}
-    class:wave-out={wave === 'out'}
+    class:wash={washing}
+    class:wave-out={app.cardsExiting}
   >
     <CardFace card={parity} />
   </div>
@@ -87,10 +65,20 @@
     opacity: 0.8;
   }
 
+  /* Each circle takes as long as a card does to deal or clear, and the next
+     one starts a fifth of the way through it. */
   .parity-card :global(.dot) {
     transform-box: fill-box;
     transform-origin: center;
-    transition: fill var(--dur-fast) ease, opacity var(--dur-fast) ease;
+    --wave-duration: var(--deal-duration);
+    --wave-easing: ease-out;
+    --wave-delay: calc(var(--wave-pos, 0) * var(--wave-duration) / 5);
+    transition:
+      fill var(--dur-fast) ease,
+      opacity var(--dur-fast) ease,
+      fill-opacity var(--wave-duration) var(--wave-easing) var(--wave-delay),
+      stroke-opacity var(--wave-duration) var(--wave-easing) var(--wave-delay),
+      scale var(--wave-duration) var(--wave-easing) var(--wave-delay);
   }
 
   /* Where each circle falls in the wave. */
@@ -111,40 +99,30 @@
     .parity-card :global(.dot:nth-child(5)) { --wave-pos: 5; }
   }
 
-  /* Each circle takes as long as a card does to deal or clear, and the next
-     one starts a fifth of the way through it. */
-  .parity-ink.wave-in :global(.dot) {
-    animation: dotIn var(--deal-duration) ease-out backwards;
-    animation-delay: calc(var(--wave-pos, 0) * var(--deal-duration) / 5);
+  /* Hidden, which is where the circles wave in from and out to. Fade fill and
+     stroke, so it doesn't mess up opacity. */
+  @starting-style {
+    .parity-card :global(.dot) {
+      fill-opacity: 0;
+      stroke-opacity: 0;
+      scale: 0.8;
+    }
   }
 
-  .parity-ink.wave-out :global(.dot) {
-    animation: dotOut var(--remove-duration) ease-in forwards;
-    animation-delay: calc(var(--wave-pos, 0) * var(--remove-duration) / 5);
-  }
-
-  .parity-ink.wave-out-in :global(.dot) {
-    --wave-gap: var(--remove-duration);
+  .parity-ink.wash :global(.dot) {
     --out-delay: calc(var(--wave-pos, 0) * var(--remove-duration) / 5);
     animation:
       celebrate calc(var(--out-delay) + var(--remove-duration) + var(--deal-duration)) var(--out-delay);
   }
 
-  /* Fade fill and stroke, so it doesn't mess up opacity. */
-  @keyframes dotIn {
-    from {
-      fill-opacity: 0;
-      stroke-opacity: 0;
-      scale: 0.8;
-    }
-  }
-
-  @keyframes dotOut {
-    to {
-      fill-opacity: 0;
-      stroke-opacity: 0;
-      scale: 0.8;
-    }
+  /* Clearing cuts a wash short rather than waiting on it. */
+  .parity-ink.wave-out :global(.dot) {
+    --wave-duration: var(--remove-duration);
+    --wave-easing: ease-in;
+    fill-opacity: 0;
+    stroke-opacity: 0;
+    scale: 0.8;
+    animation: none;
   }
 
   @keyframes celebrate {
