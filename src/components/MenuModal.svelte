@@ -32,30 +32,6 @@
     <h2 id="modal-title">Quick <span class="brand-pro">Pro</span>sets</h2>
 
     <div class="menu-row">
-      <div class="segmented" role="group" aria-label="Game mode">
-        <button
-          type="button"
-          class="segmented-btn"
-          class:active={app.mode === 'chill'}
-          onclick={() => (app.mode = 'chill')}
-        ><span class="mode-icon tortoise-icon"></span>Chill</button>
-        <button
-          type="button"
-          class="segmented-btn"
-          class:active={app.mode === 'speedy'}
-          onclick={() => (app.mode = 'speedy')}
-        ><span class="mode-icon rabbit-icon"></span>Speedy</button>
-      </div>
-      <button
-        id="menu-theme-toggle"
-        class="menu-btn icon-btn"
-        aria-label="Toggle theme"
-        title={app.theme === 'dark' ? 'Switch to light' : 'Switch to dark'}
-        onclick={onThemeToggle}
-      ><span class="theme-icon"></span></button>
-    </div>
-
-    <div class="menu-row">
       <button
         type="button"
         class="option-row"
@@ -77,6 +53,13 @@
         title="What is the parity hint?"
         onclick={() => (view = 'parity')}
       ><span class="help-icon"></span></button>
+      <button
+        id="menu-theme-toggle"
+        class="menu-btn icon-btn"
+        aria-label="Toggle theme"
+        title={app.theme === 'dark' ? 'Switch to light' : 'Switch to dark'}
+        onclick={onThemeToggle}
+      ><span class="theme-icon"></span></button>
     </div>
 
     <div class="menu-row">
@@ -184,26 +167,6 @@
     align-items: center;
     justify-content: center;
     gap: 0.3em;
-  }
-
-  .mode-icon {
-    display: inline-block;
-    width: 1.3em;
-    height: 1.3em;
-    background-color: currentColor;
-    flex-shrink: 0;
-
-    transform: translateY(-1px);
-  }
-
-  .tortoise-icon {
-    -webkit-mask: url('../icons/mdi--tortoise.svg') no-repeat center / contain;
-    mask: url('../icons/mdi--tortoise.svg') no-repeat center / contain;
-  }
-
-  .rabbit-icon {
-    -webkit-mask: url('../icons/mdi--rabbit.svg') no-repeat center / contain;
-    mask: url('../icons/mdi--rabbit.svg') no-repeat center / contain;
   }
 
   .segmented.thin {

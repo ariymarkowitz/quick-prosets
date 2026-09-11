@@ -1,5 +1,3 @@
-import type { GameMode } from './Game.svelte.js';
-
 export type Theme = 'light' | 'dark';
 
 // The two leaderboards, depending on whether the parity hint was ever visible
@@ -9,7 +7,6 @@ export type Scores = { plain: number[]; parity: number[] };
 const THEME_KEY = 'proset-game-theme';
 const SCORES_KEY = 'proset-game-scores';
 const PARITY_SCORES_KEY = 'proset-game-scores-parity';
-const MODE_KEY = 'proset-game-mode';
 const PARITY_KEY = 'proset-game-parity';
 
 export function getStoredTheme(): Theme {
@@ -20,16 +17,6 @@ export function getStoredTheme(): Theme {
 export function setTheme(theme: Theme): void {
   localStorage.setItem(THEME_KEY, theme);
   document.body.className = theme;
-}
-
-export function getMode(): GameMode {
-  const stored = localStorage.getItem(MODE_KEY);
-  if (stored === 'chill' || stored === 'speedy') return stored;
-  return 'chill';
-}
-
-export function setMode(mode: GameMode): void {
-  localStorage.setItem(MODE_KEY, mode);
 }
 
 // Parity hint is on by default.

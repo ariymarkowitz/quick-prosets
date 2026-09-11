@@ -6,15 +6,16 @@
   import MenuModal from './components/MenuModal.svelte';
   import { app } from './lib/AppState.svelte';
   import { Game } from './lib/Game.svelte';
-  import { getScores, getMode, setMode, getStoredTheme, setTheme, getShowParity, setShowParity, saveScore as persistScore } from './lib/storage';
-  import { VICTORY_MESSAGES, CARD_W, CARD_H } from './lib/constants';
+  import { getScores, getStoredTheme, setTheme, getShowParity, setShowParity, saveScore as persistScore } from './lib/storage';
+  import { VICTORY_MESSAGES, CARD_W, CARD_H, ANIM_SETTINGS } from './lib/constants';
 
   // Make the grid cell the same shape as the card viewBox.
   document.documentElement.style.setProperty('--card-short', String(CARD_W));
   document.documentElement.style.setProperty('--card-long', String(CARD_H));
+  document.documentElement.style.setProperty('--deal-duration', `${ANIM_SETTINGS.dealDuration}ms`);
+  document.documentElement.style.setProperty('--remove-duration', `${ANIM_SETTINGS.removeDuration}ms`);
 
   app.scores = getScores();
-  app.mode = getMode();
   app.theme = getStoredTheme();
   app.showParity = getShowParity();
 
@@ -28,7 +29,6 @@
       getRunning: () => app.running,
       getCardsExiting: () => app.cardsExiting,
       getShowParity: () => app.showParity,
-      getAnimSettings: () => app.animSettings,
       onEndGame: ({ time, disqualified, parityUsed }) => {
         const title = VICTORY_MESSAGES[Math.floor(Math.random() * VICTORY_MESSAGES.length)]!;
         const scores = disqualified ? getScores() : persistScore(time, parityUsed);
@@ -85,7 +85,6 @@
     }
   });
 
-  $effect(() => setMode(app.mode));
   $effect(() => setTheme(app.theme));
   $effect(() => setShowParity(app.showParity));
 
@@ -111,12 +110,6 @@
     if (!onGrid) return;
     app.cardsExiting = true;
     return () => { app.cardsExiting = false; };
-  });
-
-  $effect(() => {
-    const root = document.documentElement.style;
-    root.setProperty('--deal-duration', `${app.animSettings.dealDuration}ms`);
-    root.setProperty('--remove-duration', `${app.animSettings.removeDuration}ms`);
   });
 </script>
 

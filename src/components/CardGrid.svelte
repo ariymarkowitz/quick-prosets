@@ -5,8 +5,6 @@
 
   let { onCardsExited }: { onCardsExited: () => void } = $props();
 
-  const isChill = $derived(app.mode === 'chill');
-
   // Count exit-animation completions during cardsExiting. The parity card
   // reports its own, once for all its circles.
   let exitedCount = 0;
@@ -47,7 +45,6 @@
               class="card-inner"
               class:dealing={v.transition?.type === 'dealing'}
               class:removing={v.transition?.type === 'removing'}
-              class:chill={isChill}
               style="--delay:{v.transition?.delay}ms"
               onanimationend={handleAnimationEnd}
             >
@@ -172,17 +169,6 @@
   @keyframes dealOut {
     from {
       opacity: 1;
-      scale: 1;
-    }
-    to {
-      opacity: 0;
-      scale: 0.9;
-    }
-  }
-
-  @keyframes dealOutChill {
-    from {
-      opacity: 1;
       translate: 0 0;
       scale: 1;
     }
@@ -198,10 +184,6 @@
   }
 
   .card-inner.removing {
-    animation: dealOut var(--remove-duration) var(--delay) forwards;
-  }
-
-  .card-inner.chill.removing {
-    animation: dealOutChill var(--remove-duration) var(--delay) forwards cubic-bezier(0.4, 0, 0.6, 1);
+    animation: dealOut var(--remove-duration) var(--delay) forwards cubic-bezier(0.4, 0, 0.6, 1);
   }
 </style>

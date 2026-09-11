@@ -18,7 +18,7 @@
   {/if}
   <div class="board-heading">
     <h3>Top Times</h3>
-    <p class="board-label">{app.gameOver?.parityUsed ? 'With parity hint' : 'No parity hint'}</p>
+    <p class="board-label">{app.gameOver?.parityUsed ? 'With Parity Hint' : 'No Parity Hint'}</p>
   </div>
   <ol id="leaderboard-list">
     {#each app.gameOver?.parityUsed ? app.scores.parity : app.scores.plain as s, i}

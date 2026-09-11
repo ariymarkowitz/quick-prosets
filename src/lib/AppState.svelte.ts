@@ -1,9 +1,8 @@
-import { MODE_TIMINGS } from './constants.js';
 import type { Scores, Theme } from './storage.js';
 import type { Game } from './Game.svelte.js';
-import type { GameMode, GameOverInfo, AnimSettings } from './Game.svelte.js';
+import type { GameOverInfo } from './Game.svelte.js';
 
-export type { GameMode, GameOverInfo, AnimSettings };
+export type { GameOverInfo };
 
 // Which of the two boards the leaderboard is showing.
 export type Board = keyof Scores;
@@ -19,7 +18,6 @@ export type PendingAction = 'newGame' | 'resumePlay';
 
 class AppState {
   phase: Phase = $state({ kind: 'intro' });
-  mode: GameMode = $state('chill');
   theme: Theme = $state('light');
   showParity: boolean = $state(true);
   scores: Scores = $state({ plain: [], parity: [] });
@@ -28,8 +26,6 @@ class AppState {
   pendingAction: PendingAction | null = $state(null);
   cardsExiting: boolean = $state(false);
   game: Game | null = $state(null);
-
-  animSettings: AnimSettings = $derived(MODE_TIMINGS[this.mode]);
 
   leaderboardBoard: Board = $derived(this.leaderboardChoice ?? (this.showParity ? 'parity' : 'plain'));
 

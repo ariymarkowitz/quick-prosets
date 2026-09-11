@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { app } from '../lib/AppState.svelte';
   import type { Highlight } from '../lib/Game.svelte';
   import type { Card } from '../lib/game-utils';
   import CardFace from './CardFace.svelte';
@@ -26,7 +25,7 @@
 </script>
 
 <div
-  class={['card', highlight, app.mode]}
+  class={['card', highlight]}
   role="button"
   tabindex="0"
   {onpointerdown}
@@ -72,9 +71,6 @@
     border-color: var(--valid) !important;
     box-shadow: 0 0 0 3px var(--valid-glow), 0 5px 14px var(--shadow-hover) !important;
     transform: translateY(-4px);
-  }
-
-  .card.valid.chill {
     animation: pulse-valid 0.3s ease forwards;
   }
 

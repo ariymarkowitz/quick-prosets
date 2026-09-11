@@ -17,7 +17,7 @@
   // The circles are shown unless the board is clearing, and transition between
   // the two. The pulse plays while a proset resolves; clicks are ignored until
   // that ends, so the class always comes off before the next proset.
-  const pulsing = $derived(app.mode === 'chill' && (app.game?.resolvingProset ?? false));
+  const pulsing = $derived(app.game?.resolvingProset ?? false);
 
   // Report once every circle has waved out.
   let root: HTMLDivElement;

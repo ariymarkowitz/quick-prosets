@@ -1,6 +1,6 @@
 import { untrack } from 'svelte';
 import { generateDeck, isValidProset, findProset, xorOf, type Card } from './game-utils.js';
-import { BOARD_SIZE, DEAL_SETTLE_MS, MODE_TIMINGS } from './constants.js';
+import { BOARD_SIZE, DEAL_SETTLE_MS, ANIM_SETTINGS } from './constants.js';
 import { createTimer } from './timer.svelte.js';
 
 export type EntryTransition =
@@ -28,10 +28,6 @@ export type GameOverInfo = {
   parityUsed: boolean;
 };
 
-export type GameMode = 'chill' | 'speedy';
-
-export type AnimSettings = typeof MODE_TIMINGS[GameMode];
-
 type Resolution =
   | null
   | { stage: 'flash'; ids: number[] }
@@ -43,7 +39,6 @@ export type GameDeps = {
   getRunning: () => boolean;
   getCardsExiting: () => boolean;
   getShowParity: () => boolean;
-  getAnimSettings: () => AnimSettings;
   onEndGame: (result: { time: number; disqualified: boolean; parityUsed: boolean }) => void;
 };
 
@@ -96,13 +91,11 @@ export class Game {
       const r = this.resolution;
       if (!r) return;
 
-      const animSettings = this.#deps.getAnimSettings();
-
       const id = setTimeout(() => {
         if (r.stage === 'flash') {
           this.prosetsFound += 1;
           this.selectedIds = [];
-          this.resolution = { stage: 'removing', ids: r.ids, stagger: animSettings.stagger };
+          this.resolution = { stage: 'removing', ids: r.ids, stagger: ANIM_SETTINGS.stagger };
         } else if (r.stage === 'removing') {
           for (const e of this.board) if (r.ids.includes(e.id)) e.card = null;
           this.#topUp(true);
@@ -111,7 +104,7 @@ export class Game {
           this.resolution = null;
           this.#checkBoard();
         }
-      }, this.#stageDuration(r, animSettings));
+      }, this.#stageDuration(r));
 
       return () => clearTimeout(id);
     });
@@ -124,7 +117,6 @@ export class Game {
 
   cardStatus(entry: BoardEntry): EntryStatus {
     const r = this.resolution;
-    const animSettings = this.#deps.getAnimSettings();
     const cardsExiting = this.#deps.getCardsExiting();
     let transition: EntryTransition = null;
     let highlight: Highlight = null;
@@ -133,12 +125,12 @@ export class Game {
 
     if (cardsExiting) {
       const idx = this.activeEntries.findIndex(e => e.id === entry.id);
-      const removeDelay = Math.max(0, idx * animSettings.fastStagger);
+      const removeDelay = Math.max(0, idx * ANIM_SETTINGS.fastStagger);
       transition = { type: 'removing', delay: removeDelay };
     } else if (r?.stage === 'removing' && rId >= 0) {
       transition = { type: 'removing', delay: rId * r.stagger };
     } else if (r?.stage === 'dealing' && rId >= 0) {
-      transition = { type: 'dealing', delay: rId * animSettings.stagger };
+      transition = { type: 'dealing', delay: rId * ANIM_SETTINGS.stagger };
     }
 
     if (r?.stage === 'flash' && rId >= 0) {
@@ -208,7 +200,8 @@ export class Game {
 
   // --- Private helpers ---
 
-  #stageDuration(r: NonNullable<Resolution>, a: AnimSettings): number {
+  #stageDuration(r: NonNullable<Resolution>): number {
+    const a = ANIM_SETTINGS;
     switch (r.stage) {
       case 'flash':    return a.validFlash;
       case 'removing': return Math.max(0, r.ids.length - 1) * r.stagger + a.removeDuration;
