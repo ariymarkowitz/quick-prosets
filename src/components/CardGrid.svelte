@@ -1,57 +1,54 @@
 <script lang="ts">
+  import { tick } from 'svelte';
   import { app } from '../lib/AppState.svelte';
+  import { ANIM_SETTINGS } from '../lib/constants';
+  import type { BoardEntry, EntryTransition, Game } from '../lib/Game.svelte';
   import Card from './Card.svelte';
   import ParityCard from './ParityCard.svelte';
 
   let { onCardsExited }: { onCardsExited: () => void } = $props();
 
-  // Count exit-animation completions during cardsExiting. The parity card
-  // reports its own, once for all its circles.
-  let exitedCount = 0;
-  let parityExited = false;
+  // Clearing the board overrides whatever the game has a card doing, and sends
+  // the cards off in quick succession.
+  function transitionOf(game: Game, entry: BoardEntry): EntryTransition {
+    if (!app.cardsExiting) return game.cardTransition(entry);
+    const i = game.activeEntries.findIndex(e => e.id === entry.id);
+    return { type: 'removing', delay: i * ANIM_SETTINGS.exitStagger };
+  }
+
+  // The exit is over once every animation under the grid has settled. The game
+  // holds still while it isn't running, so nothing starts mid-exit and the
+  // animations present at the start are all of them. This effect runs before
+  // the blocks below it pick up the exit classes, hence the tick.
+  let grid: HTMLDivElement;
   $effect(() => {
-    if (!app.cardsExiting) {
-      exitedCount = 0;
-      parityExited = false;
-    }
+    if (!app.cardsExiting) return;
+    let live = true;
+    tick()
+      .then(() => Promise.allSettled(grid.getAnimations({ subtree: true }).map(a => a.finished)))
+      .then(() => { if (live) onCardsExited(); });
+    return () => { live = false; };
   });
-
-  function checkExited() {
-    const cardsDone = exitedCount >= (app.game?.activeEntries.length ?? 0);
-    if (cardsDone && (parityExited || !app.showParity)) onCardsExited();
-  }
-
-  function handleAnimationEnd() {
-    if (!app.cardsExiting) return;
-    exitedCount++;
-    checkExited();
-  }
-
-  function handleParityExited() {
-    if (!app.cardsExiting) return;
-    parityExited = true;
-    checkExited();
-  }
 </script>
 
 <main id="card-grid-wrap">
-  <div id="card-grid" class:with-parity={app.showParity}>
-    {#if app.cardsMounted}
-      {#each app.game?.board ?? [] as entry (entry.id)}
+  <div id="card-grid" class:with-parity={app.showParity} bind:this={grid}>
+    {#if app.cardsMounted && app.game}
+      {@const game = app.game}
+      {#each game.board as entry (entry.id)}
         <div class="card-slot">
           {#if entry.card !== null}
-            {@const v = app.game?.cardStatus(entry) ?? { transition: null, highlight: null }}
+            {@const transition = transitionOf(game, entry)}
             <div
               class="card-inner"
-              class:dealing={v.transition?.type === 'dealing'}
-              class:removing={v.transition?.type === 'removing'}
-              style="--delay:{v.transition?.delay}ms"
-              onanimationend={handleAnimationEnd}
+              class:dealing={transition?.type === 'dealing'}
+              class:removing={transition?.type === 'removing'}
+              style="--delay:{transition?.delay}ms"
             >
               <Card
                 card={entry.card}
-                highlight={v.highlight}
-                onclick={() => app.game?.handleCardClick(entry.id)}
+                highlight={game.cardHighlight(entry)}
+                onclick={() => game.handleCardClick(entry.id)}
               />
             </div>
           {/if}
@@ -59,7 +56,7 @@
       {/each}
       {#if app.showParity}
         <div class="parity-slot">
-          <ParityCard onExited={handleParityExited} />
+          <ParityCard />
         </div>
       {/if}
     {/if}
@@ -82,6 +79,9 @@
        half-cards: three lanes of six half-columns, each card spanning two. */
     --card-w: var(--card-short);
     --card-h: var(--card-long);
+    /* 1 when the cards are turned sideways, for anything that has to know
+       before layout (a container query only answers after). */
+    --landscape: 0;
     /* How far the 2-3-2 moves down its own axis to make room for a lane in
        front of it — counted in whatever that axis's tracks are. */
     --row-shift: 0;
@@ -89,7 +89,6 @@
     grid-template-columns: repeat(6, 1fr);
     grid-template-rows: repeat(3, 1fr);
     aspect-ratio: calc(3 * var(--card-w)) / calc(3 * var(--card-h));
-    
     place-self: center;
     width: 100%;
     max-width: 100dvh;
@@ -106,12 +105,16 @@
   .card-slot:nth-child(6) { --lane: 3; --pos: 2; }
   .card-slot:nth-child(7) { --lane: 3; --pos: 4; }
 
-  .card-slot {
-    grid-row: calc(var(--lane) + var(--row-shift));
-    grid-column: var(--pos) / span 2;
+  .card-slot,
+  .parity-slot {
     display: flex;
     flex-direction: column;
     min-height: 0;
+  }
+
+  .card-slot {
+    grid-row: calc(var(--lane) + var(--row-shift));
+    grid-column: var(--pos) / span 2;
   }
 
   /* The parity hint takes a full lane of its own. */
@@ -124,17 +127,15 @@
   .parity-slot {
     grid-row: 1;
     grid-column: 3 / span 2;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
   }
 
+  .card-inner > :global(.card),
   .parity-slot > :global(.parity-card) {
     flex: 1;
   }
 
-  /* Rotate the card aspect ratio about when the cards will be wider than they are tall, or whenever the page hits
-     its max width (desktop). */
+  /* Turn the cards landscape at about the point they would come out wider than
+     tall, and always once the page hits its max width (desktop). */
   @media (min-aspect-ratio: 4/5), (min-width: 1000px) {
     #card-grid-wrap {
       padding-bottom: min(60px, 10dvh);
@@ -143,17 +144,13 @@
     #card-grid {
       --card-w: var(--card-long);
       --card-h: var(--card-short);
+      --landscape: 1;
     }
   }
 
   .card-inner {
     display: flex;
     flex-direction: column;
-    flex: 1;
-    opacity: 1;
-  }
-
-  .card-inner > :global(.card) {
     flex: 1;
   }
 
@@ -163,19 +160,9 @@
       translate: 0 -8px;
       scale: 0.95;
     }
-    to {
-      opacity: 1;
-      translate: 0 0;
-      scale: 1;
-    }
   }
 
   @keyframes dealOut {
-    from {
-      opacity: 1;
-      translate: 0 0;
-      scale: 1;
-    }
     to {
       opacity: 0;
       translate: 0 -24px;

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { app } from '../lib/AppState.svelte';
+  import { BOARD_LABELS } from '../lib/constants';
   import { formatTime } from '../lib/game-utils';
   import Modal from './Modal.svelte';
 
@@ -10,28 +11,30 @@
   } = $props();
 </script>
 
-<Modal open={app.canShowModal && !!app.gameOver} onOpen={onModalOpened} onClose={onModalClosed}>
-  <h2 id="modal-title">{app.gameOver?.title}</h2>
-  <p id="final-time-display">{formatTime(app.gameOver?.time ?? 0)}</p>
-  {#if app.gameOver?.disqualified}
-    <p class="disqualified-note">Hint used — time not saved to leaderboard</p>
+<Modal open={app.canShowModal && app.gameOver !== null} onOpen={onModalOpened} onClose={onModalClosed}>
+  {#if app.gameOver}
+    {@const { title, time, disqualified, board, currentIdx } = app.gameOver}
+    <h2 id="modal-title">{title}</h2>
+    <p id="final-time-display">{formatTime(time)}</p>
+    {#if disqualified}
+      <p class="note">Hint used — time not saved to leaderboard</p>
+    {/if}
+    <div class="board-heading">
+      <h3>Top Times</h3>
+      <p class="note">{BOARD_LABELS[board]}</p>
+    </div>
+    <ol id="leaderboard-list">
+      {#each app.scores[board] as s, i}
+        <li class:current-score={i === currentIdx}>
+          {i + 1}. {formatTime(s)}
+        </li>
+      {/each}
+    </ol>
+    <button class="primary-btn" onclick={newGame}>Play Again</button>
   {/if}
-  <div class="board-heading">
-    <h3>Top Times</h3>
-    <p class="board-label">{app.gameOver?.parityUsed ? 'With Parity Hint' : 'No Parity Hint'}</p>
-  </div>
-  <ol id="leaderboard-list">
-    {#each app.gameOver?.parityUsed ? app.scores.parity : app.scores.plain as s, i}
-      <li class:current-score={i === app.gameOver?.currentIdx}>
-        {i + 1}. {formatTime(s)}
-      </li>
-    {/each}
-  </ol>
-  <button id="play-again-btn" onclick={newGame}>Play Again</button>
 </Modal>
 
 <style>
-
   #final-time-display {
     font-size: var(--time-fs);
     font-weight: 800;
@@ -47,14 +50,9 @@
     gap: 3px;
   }
 
-  .board-label {
-    margin-top: 0;
-    font-size: 0.85rem;
-    color: var(--text-muted);
-  }
-
-  /* Sits on the modal's own flex gap, so it opts out of the global p + p rule. */
-  .disqualified-note {
+  /* The disqualified note sits on the modal's own flex gap, so it opts out of
+     the global p + p rule. */
+  .note {
     margin-top: 0;
     font-size: 0.85rem;
     color: var(--text-muted);

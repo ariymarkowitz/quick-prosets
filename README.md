@@ -10,7 +10,7 @@ A proset is a set of cards where every colour is solid an even number of times.
 
 Click on cards to select them. If the selected cards form a proset, they're removed and replaced from the deck.
 
-The deck is the 63 cards with at least one solid circle (the all-open circle is not included because it is a proset by itself).
+The deck is the 63 cards with at least one solid circle (the all-open card is not included because it is a proset by itself).
 
 The game ends when all of the cards are cleared. A property of ProSets is that once the deck is empty, all of the remaining cards together form a proset.
 
@@ -19,7 +19,7 @@ The game ends when all of the cards are cleared. A property of ProSets is that o
 - Light/dark theme toggle
 - A 'parity hint' that shows which colours your selection clears.
 - Hints for when you are stuck
-- Top 5 leaderboard saved locally
+- Top 5 leaderboards saved locally (one for using the parity hint, one without)
 - Works well on mobile browsers
 - The cards orient vertically in portrait mode, and horizontally in landscape mode
 - Can be installed as a Progressive Web App

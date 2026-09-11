@@ -1,5 +1,3 @@
-export type Timer = ReturnType<typeof createTimer>;
-
 export function createTimer(getPaused: () => boolean) {
   const start = Date.now();
   let pauseAccumulated = 0;
@@ -27,7 +25,6 @@ export function createTimer(getPaused: () => boolean) {
   });
 
   return {
-    get paused() { return getPaused(); },
     get sample() { return sample; }
   }
 }

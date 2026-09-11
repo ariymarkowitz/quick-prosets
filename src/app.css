@@ -100,12 +100,6 @@ p + p {
   margin-top: 10px;
 }
 
-.hidden-svg {
-  position: absolute;
-  width: 0;
-  height: 0;
-}
-
 html {
   font-size: 13pt;
   font-family: 'Nunito', sans-serif;
@@ -155,7 +149,9 @@ body.dark::after {
 /* ─── Layout ────────────────────────────────────────────────────────────────── */
 
 #game {
-  position: relative; /* Allow for blending with game background */
+  /* No z-index: a stacking context here would stop the parity card blending
+     with the page texture. */
+  position: relative;
   max-width: min(1000px, 190dvh);
   margin: 0 auto;
   height: 100vh;
@@ -199,7 +195,9 @@ button:active {
   margin-bottom: 3px;
 }
 
-#play-again-btn {
+/* Qualified with the tag so it outranks button:active, whose instant
+   transition would otherwise cut off the press animation. */
+button.primary-btn {
   width: 100%;
   padding: 12px;
   font-size: var(--fs-md);
@@ -208,16 +206,14 @@ button:active {
   color: #ffffff;
   border: none;
   border-radius: var(--radius-md);
-  cursor: pointer;
   transition: opacity var(--dur-quick) ease, transform 0.1s ease;
 }
 
-#play-again-btn:hover {
-  background: var(--accent);
+button.primary-btn:hover {
   opacity: 0.88;
 }
 
-#play-again-btn:active {
+button.primary-btn:active {
   transform: scale(0.97);
 }
 
@@ -252,9 +248,9 @@ button:active {
 }
 
 /* ─── Circle Fill & Stroke ───────────────────────────────────────────────────
-   Applied to the <circle> elements on a card. Stroke widths are in the card's
-   own coordinate space (0–100 wide); an open circle strokes where a solid one
-   fills, so both end up with the same outer diameter.
+   Applied to the <circle> elements on a card. Every circle is stroked in its
+   colour. A solid circle is filled with it; an open one gets a faint tint and
+   is faded back. The stroke width comes from DOT_STROKE in constants.ts.
  ──────────────────────────────────────────────────────────────────────────── */
 
 .dot {

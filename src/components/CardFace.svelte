@@ -1,6 +1,6 @@
 <script lang="ts">
   import {
-    CARD_W, CARD_H, DOT_COLS, DOT_R, DOT_STROKE, DOT_X0, DOT_Y0, DOT_SPACING,
+    CARD_W, CARD_H, DOT_COLS, DOT_R, DOT_STROKE, DOT_INSET, DOT_SPACING,
   } from '../lib/constants';
   import { COLORS, isSolid, type Card } from '../lib/game-utils';
 
@@ -12,8 +12,8 @@
 <svg viewBox="0 0 {CARD_W} {CARD_H}" class="card-svg" preserveAspectRatio="xMidYMid meet">
   {#each COLORS as color, i}
     <circle
-      cx={DOT_X0 + (i % DOT_COLS) * DOT_SPACING}
-      cy={DOT_Y0 + Math.floor(i / DOT_COLS) * DOT_SPACING}
+      cx={DOT_INSET + (i % DOT_COLS) * DOT_SPACING}
+      cy={DOT_INSET + Math.floor(i / DOT_COLS) * DOT_SPACING}
       r={DOT_R}
       stroke-width={DOT_STROKE}
       class="dot color-{color} {isSolid(card, i) ? 'solid' : 'open'}"

@@ -1,9 +1,5 @@
 // The six circle colours, in the fixed order they are drawn on every card.
-// Position is what identifies a colour, so the board stays playable without
-// relying on colour discrimination.
 export const COLORS = ['red', 'orange', 'green', 'blue', 'purple', 'pink'] as const;
-
-export type Color = typeof COLORS[number];
 
 // A card is a bitmask over COLORS: bit i set means that colour's circle is
 // solid, clear means it is open. The all-open card (mask 0) is left out of the
@@ -14,17 +10,15 @@ export type Color = typeof COLORS[number];
 // once the deck runs dry is itself a proset. The deck always plays out.
 export type Card = number;
 
-export const DECK_SIZE = (1 << COLORS.length) - 1;
+const DECK_SIZE = (1 << COLORS.length) - 1;
 
 export const isSolid = (card: Card, index: number): boolean =>
   (card & (1 << index)) !== 0;
 
-export function shuffle<T>(arr: T[]): T[] {
+function shuffle<T>(arr: T[]): T[] {
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    const tmp = arr[i]!;
-    arr[i] = arr[j]!;
-    arr[j] = tmp;
+    [arr[i], arr[j]] = [arr[j]!, arr[i]!];
   }
   return arr;
 }

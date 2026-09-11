@@ -1,6 +1,8 @@
 <script lang="ts">
   import { app } from '../lib/AppState.svelte';
+  import { BOARD_LABELS } from '../lib/constants';
   import { formatTime } from '../lib/game-utils';
+  import type { Board } from '../lib/storage';
   import Modal from './Modal.svelte';
 
   let { newGame, closeMenu, onModalOpened, onModalClosed }: {
@@ -13,9 +15,11 @@
   type View = 'main' | 'help' | 'leaderboard' | 'parity';
   let view: View = $state('main');
 
-  // The chosen board lives on `app`, so it is remembered across openings for as
-  // long as the page is open.
-  const shownScores = $derived(app.scores[app.leaderboardBoard]);
+  // The leaderboard follows the parity setting until one is picked. This
+  // component is never unmounted, so the pick lasts as long as the page.
+  const boards: Board[] = ['parity', 'plain'];
+  let chosenBoard: Board | null = $state(null);
+  const shownBoard = $derived<Board>(chosenBoard ?? (app.showParity ? 'parity' : 'plain'));
 
   function onThemeToggle() {
     app.theme = app.theme === 'dark' ? 'light' : 'dark';
@@ -41,11 +45,7 @@
         onclick={() => (app.showParity = !app.showParity)}
       >
         <span class="parity-label">Show Parity Hint</span>
-        <span
-          class="parity-switch"
-          class:solid={app.showParity}
-          aria-hidden="true"
-        ></span>
+        <span class="parity-switch" aria-hidden="true"></span>
       </button>
       <button
         class="menu-btn icon-btn"
@@ -54,7 +54,6 @@
         onclick={() => (view = 'parity')}
       ><span class="help-icon"></span></button>
       <button
-        id="menu-theme-toggle"
         class="menu-btn icon-btn"
         aria-label="Toggle theme"
         title={app.theme === 'dark' ? 'Switch to light' : 'Switch to dark'}
@@ -67,7 +66,7 @@
       <button class="menu-btn" onclick={() => (view = 'leaderboard')}>Leaderboard</button>
     </div>
 
-    <button id="play-again-btn" onclick={newGame}>
+    <button class="primary-btn" onclick={newGame}>
       {app.gameActive ? 'Restart' : 'Start'}
     </button>
     {#if app.gameActive}
@@ -75,81 +74,76 @@
     {/if}
 
     <a class="site-link" href="https://arimarkowitz.com" target="_blank" rel="noopener noreferrer">More at arimarkowitz.com</a>
-  {:else if view === 'help'}
-    <h2 id="modal-title">How to Play</h2>
-    <div class="help-text">
-      <p>Find a <strong>proset</strong>: a group of cards where every colour is solid an even number of times.</p>
-      <p>Each card has six circles of different colours (red, orange, green, blue, purple, pink). Each circle is either solid or open.</p>
-      <ul>
-        <li>Pick a colour, then count the solid circles of that colour across the cards you have chosen.</li>
-        <li>The count has to be <strong>even</strong>.</li>
-        <li>This rule must be satisfied across all 6 colours.</li>
-      </ul>
-      <p>Tap cards to select them. As soon as you select a proset the cards are taken and replaced. Try to clear the deck as fast as you can!</p>
-    </div>
-    <button id="play-again-btn" onclick={() => (view = 'main')}>Back</button>
-  {:else if view === 'parity'}
-    <h2 id="modal-title">Parity Hint</h2>
-    <div class="help-text">
-      <p>The parity hint is a ghost card above the board that shows which colours your selection clears.</p>
-      <p>
-        A circle will be <strong>solid</strong> if it's colour is solid an odd number of times among the selected cards.
-        Otherwise it will be <strong>open</strong>.
-      </p>
-      <p>
-        The parity hint is exactly the card that would complete your selection into a proset.
-        Once every circle is open, the cards you have selected are a proset.
-      </p>
-      <p>
-        Games where the parity hint was viewed are in a separate leaderboard to games where it wasn't viewed.
-        Without the parity hint, the game is much harder!
-      </p>
-    </div>
-    <button id="play-again-btn" onclick={() => (view = 'main')}>Back</button>
-  {:else if view === 'leaderboard'}
-    <h2 id="modal-title">Top Times</h2>
-    <div class="segmented thin" role="group" aria-label="Leaderboard">
-      <button
-          type="button"
-          class="segmented-btn"
-          class:active={app.leaderboardBoard === 'parity'}
-          onclick={() => (app.leaderboardChoice = 'parity')}
-      >With Parity Hint</button>
-      <button
-        type="button"
-        class="segmented-btn"
-        class:active={app.leaderboardBoard === 'plain'}
-        onclick={() => (app.leaderboardChoice = 'plain')}
-      >No Parity Hint</button>
-    </div>
-    {#if shownScores.length === 0}
-      <p class="empty-scores">
-        No times yet — finish a game
-        {app.leaderboardBoard === 'parity' ? 'with the parity hint' : 'without the parity hint'} to set a record.
-      </p>
+  {:else}
+    {#if view === 'help'}
+      <h2 id="modal-title">How to Play</h2>
+      <div class="help-text">
+        <p>Find a <strong>proset</strong>: a group of cards where every colour is solid an even number of times.</p>
+        <p>Each card has six circles of different colours (red, orange, green, blue, purple, pink). Each circle is either solid or open.</p>
+        <ul>
+          <li>Pick a colour, then count the solid circles of that colour across the cards you have chosen.</li>
+          <li>The count has to be <strong>even</strong>.</li>
+          <li>This rule must be satisfied across all 6 colours.</li>
+        </ul>
+        <p>Tap cards to select them. As soon as you select a proset the cards are taken and replaced. Try to clear the deck as fast as you can!</p>
+      </div>
+    {:else if view === 'parity'}
+      <h2 id="modal-title">Parity Hint</h2>
+      <div class="help-text">
+        <p>The parity hint is a ghost card above the board that shows which colours your selection clears.</p>
+        <p>
+          A circle will be <strong>solid</strong> if its colour is solid an odd number of times among the selected cards.
+          Otherwise it will be <strong>open</strong>.
+        </p>
+        <p>
+          The parity hint is exactly the card that would complete your selection into a proset.
+          Once every circle is open, the cards you have selected are a proset.
+        </p>
+        <p>
+          Games where the parity hint was viewed are in a separate leaderboard to games where it wasn't viewed.
+          Without the parity hint, the game is much harder!
+        </p>
+      </div>
     {:else}
-      <ol id="leaderboard-list">
-        {#each shownScores as s, i}
-          <li>{i + 1}. {formatTime(s)}</li>
+      <h2 id="modal-title">Top Times</h2>
+      <div class="segmented" role="group" aria-label="Leaderboard">
+        {#each boards as board}
+          <button
+            type="button"
+            class="segmented-btn"
+            class:active={shownBoard === board}
+            onclick={() => (chosenBoard = board)}
+          >{BOARD_LABELS[board]}</button>
         {/each}
-      </ol>
+      </div>
+      {#if app.scores[shownBoard].length === 0}
+        <p class="empty-scores">
+          No times yet — finish a game {shownBoard === 'parity' ? 'with' : 'without'} the parity hint to set a record.
+        </p>
+      {:else}
+        <ol id="leaderboard-list">
+          {#each app.scores[shownBoard] as s, i}
+            <li>{i + 1}. {formatTime(s)}</li>
+          {/each}
+        </ol>
+      {/if}
     {/if}
-    <button id="play-again-btn" onclick={() => (view = 'main')}>Back</button>
+    <button class="primary-btn" onclick={() => (view = 'main')}>Back</button>
   {/if}
 </Modal>
 
 <style>
-
   /* Fixed, not themed like --dot-orange — this orange stays the same in light and dark. */
   .brand-pro {
     color: #e47503;
   }
 
   .segmented {
+    flex-shrink: 0;
     display: flex;
     width: 100%;
     border: 1px solid var(--border);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     overflow: hidden;
     transition: border var(--dur-slow) ease;
   }
@@ -159,25 +153,13 @@
     background: var(--surface-alt);
     border: none;
     border-radius: 0;
-    padding: 9px 0;
-    font-size: var(--fs-sm);
+    padding: 2px 14px;
+    font-size: var(--fs-xs);
     font-weight: 600;
     color: var(--text-muted);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.3em;
-  }
-
-  .segmented.thin {
-    flex-shrink: 0;
-    border-radius: var(--radius-sm);
-  }
-
-  .segmented.thin .segmented-btn {
-    flex: 1;
-    padding: 2px 14px;
-    font-size: var(--fs-xs);
   }
 
   .segmented-btn + .segmented-btn {
@@ -236,11 +218,8 @@
     transition: opacity var(--dur-quick) ease;
   }
 
-  .parity-switch.solid {
-    opacity: 1;
-  }
-
-  .parity-switch.solid::after {
+  .option-row.active .parity-switch,
+  .option-row.active .parity-switch::after {
     opacity: 1;
   }
 
@@ -265,7 +244,6 @@
     width: 1.4em;
     height: 1.4em;
     background-color: var(--text-muted);
-    -webkit-mask: url('../icons/mdi--help-circle-outline.svg') no-repeat center / contain;
     mask: url('../icons/mdi--help-circle-outline.svg') no-repeat center / contain;
   }
 
@@ -274,12 +252,10 @@
     width: 1.3em;
     height: 1.3em;
     background-color: var(--text);
-    -webkit-mask: url('../icons/material-symbols--dark-mode.svg') no-repeat center / contain;
     mask: url('../icons/material-symbols--dark-mode.svg') no-repeat center / contain;
   }
 
   :global(body.dark) .theme-icon {
-    -webkit-mask-image: url('../icons/material-symbols--light-mode.svg');
     mask-image: url('../icons/material-symbols--light-mode.svg');
   }
 

@@ -1,11 +1,14 @@
-import type { Scores, Theme } from './storage.js';
+import type { Board, Scores, Theme } from './storage.js';
 import type { Game } from './Game.svelte.js';
-import type { GameOverInfo } from './Game.svelte.js';
 
-export type { GameOverInfo };
-
-// Which of the two boards the leaderboard is showing.
-export type Board = keyof Scores;
+export type GameOverInfo = {
+  title: string;
+  time: number;
+  // This time's place on its leaderboard, or -1 if it isn't on it.
+  currentIdx: number;
+  disqualified: boolean;
+  board: Board;
+};
 
 export type Phase =
   | { kind: 'intro' }
@@ -21,13 +24,9 @@ class AppState {
   theme: Theme = $state('light');
   showParity: boolean = $state(true);
   scores: Scores = $state({ plain: [], parity: [] });
-  // Choice of leaderboard: persists while the app is running.
-  leaderboardChoice: Board | null = $state(null);
   pendingAction: PendingAction | null = $state(null);
   cardsExiting: boolean = $state(false);
   game: Game | null = $state(null);
-
-  leaderboardBoard: Board = $derived(this.leaderboardChoice ?? (this.showParity ? 'parity' : 'plain'));
 
   running = $derived(this.phase.kind === 'playing');
   paused = $derived(this.phase.kind === 'pausedMenu' || this.phase.kind === 'pausedTab');

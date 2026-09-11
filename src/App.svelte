@@ -6,36 +6,36 @@
   import MenuModal from './components/MenuModal.svelte';
   import { app } from './lib/AppState.svelte';
   import { Game } from './lib/Game.svelte';
-  import { getScores, getStoredTheme, setTheme, getShowParity, setShowParity, saveScore as persistScore } from './lib/storage';
+  import { getScores, getStoredTheme, setTheme, getShowParity, setShowParity, saveScore, type Board } from './lib/storage';
   import { VICTORY_MESSAGES, CARD_W, CARD_H, ANIM_SETTINGS } from './lib/constants';
 
-  // Make the grid cell the same shape as the card viewBox.
-  document.documentElement.style.setProperty('--card-short', String(CARD_W));
-  document.documentElement.style.setProperty('--card-long', String(CARD_H));
-  document.documentElement.style.setProperty('--deal-duration', `${ANIM_SETTINGS.dealDuration}ms`);
-  document.documentElement.style.setProperty('--remove-duration', `${ANIM_SETTINGS.removeDuration}ms`);
+  // The grid cell takes the card viewBox's shape, and the CSS animations take
+  // the same durations as the game's stage timers.
+  const root = document.documentElement.style;
+  root.setProperty('--card-short', String(CARD_W));
+  root.setProperty('--card-long', String(CARD_H));
+  root.setProperty('--deal-duration', `${ANIM_SETTINGS.dealDuration}ms`);
+  root.setProperty('--remove-duration', `${ANIM_SETTINGS.removeDuration}ms`);
 
   app.scores = getScores();
   app.theme = getStoredTheme();
   app.showParity = getShowParity();
 
   let gameCounter = $state(0);
-  let modalAnimating = $state(false);
+  let modalVisible = $state(false);
 
   $effect(() => {
-    const counter = gameCounter;
-    if (counter === 0) return;
+    if (gameCounter === 0) return;
     app.game = new Game({
       getRunning: () => app.running,
-      getCardsExiting: () => app.cardsExiting,
       getShowParity: () => app.showParity,
       onEndGame: ({ time, disqualified, parityUsed }) => {
         const title = VICTORY_MESSAGES[Math.floor(Math.random() * VICTORY_MESSAGES.length)]!;
-        const scores = disqualified ? getScores() : persistScore(time, parityUsed);
-        const board = parityUsed ? scores.parity : scores.plain;
-        const currentIdx = disqualified ? -1 : board.indexOf(time);
+        const board: Board = parityUsed ? 'parity' : 'plain';
+        const scores = disqualified ? getScores() : saveScore(time, board);
+        const currentIdx = disqualified ? -1 : scores[board].indexOf(time);
         app.scores = scores;
-        app.phase = { kind: 'over', info: { title, time, currentIdx, disqualified, parityUsed } };
+        app.phase = { kind: 'over', info: { title, time, currentIdx, disqualified, board } };
       },
     });
     return () => { app.game = null; };
@@ -58,34 +58,28 @@
   }
 
   function onModalOpened(): void {
-    modalAnimating = true;
+    modalVisible = true;
   }
 
   function onModalClosed(): void {
-    modalAnimating = false;
-  }
-
-  function onCardsExited(): void {
-    app.cardsExiting = false;
+    modalVisible = false;
   }
 
   $effect(() => {
-    if (app.pendingAction !== null && !app.cardsExiting && !modalAnimating) {
-      untrack(() => {
-        const action = app.pendingAction;
-        app.pendingAction = null;
-        if (action === 'newGame') {
-          gameCounter++;
-          app.phase = { kind: 'playing' };
-        } else if (action === 'resumePlay') {
-          app.phase = { kind: 'playing' };
-          app.game?.triggerResumeDeal();
-        }
-      });
-    }
+    const action = app.pendingAction;
+    if (action === null || app.cardsExiting || modalVisible) return;
+    untrack(() => {
+      app.pendingAction = null;
+      app.phase = { kind: 'playing' };
+      if (action === 'newGame') gameCounter++;
+      else app.game?.resume();
+    });
   });
 
-  $effect(() => setTheme(app.theme));
+  $effect(() => {
+    document.body.className = app.theme;
+    setTheme(app.theme);
+  });
   $effect(() => setShowParity(app.showParity));
 
   $effect(() => {
@@ -100,14 +94,10 @@
     return () => document.removeEventListener('visibilitychange', onChange);
   });
 
+  // Once the board stops being shown, it animates away before anything else
+  // happens. CardGrid reports when it's done.
   $effect.pre(() => {
-    if (app.cardsShown) return;
-    // The parity card is still up after the last cards clear, so a finished
-    // game has something to animate out too.
-    const onGrid = untrack(() =>
-      app.game !== null && (app.game.activeEntries.length > 0 || app.showParity)
-    );
-    if (!onGrid) return;
+    if (app.cardsShown || untrack(() => app.game) === null) return;
     app.cardsExiting = true;
     return () => { app.cardsExiting = false; };
   });
@@ -115,7 +105,7 @@
 
 <div id="game">
   <Header {openMenu} {closeMenu} />
-  <CardGrid {onCardsExited} />
+  <CardGrid onCardsExited={() => (app.cardsExiting = false)} />
   <GameOverModal {newGame} {onModalOpened} {onModalClosed} />
   <MenuModal {newGame} {closeMenu} {onModalOpened} {onModalClosed} />
 </div>
