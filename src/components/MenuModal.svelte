@@ -93,7 +93,7 @@
     <div class="help-text">
       <p>The parity hint is a ghost card above the board that tracks the cards you have selected.</p>
       <p>
-        A circle will be <strong>solid</strong> if it appears solid an odd number of times among the selected cards.
+        A circle will be <strong>solid</strong> if it's colour is solid an odd number of times among the selected cards.
         Otherwise it will be <strong>open</strong>.
       </p>
       <p>
