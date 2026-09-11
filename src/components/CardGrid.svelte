@@ -7,17 +7,32 @@
 
   const isChill = $derived(app.mode === 'chill');
 
-  // Count exit-animation completions during cardsExiting.
+  // Count exit-animation completions during cardsExiting. The parity card
+  // reports its own, once for all its circles.
   let exitedCount = 0;
+  let parityExited = false;
   $effect(() => {
-    if (!app.cardsExiting) exitedCount = 0;
+    if (!app.cardsExiting) {
+      exitedCount = 0;
+      parityExited = false;
+    }
   });
+
+  function checkExited() {
+    const cardsDone = exitedCount >= (app.game?.activeEntries.length ?? 0);
+    if (cardsDone && (parityExited || !app.showParity)) onCardsExited();
+  }
 
   function handleAnimationEnd() {
     if (!app.cardsExiting) return;
     exitedCount++;
-    const total = app.game?.activeEntries.length ?? 0;
-    if (exitedCount >= total) onCardsExited();
+    checkExited();
+  }
+
+  function handleParityExited() {
+    if (!app.cardsExiting) return;
+    parityExited = true;
+    checkExited();
   }
 </script>
 
@@ -47,7 +62,7 @@
       {/each}
       {#if app.showParity}
         <div class="parity-slot">
-          <ParityCard />
+          <ParityCard onExited={handleParityExited} />
         </div>
       {/if}
     {/if}

@@ -103,8 +103,12 @@
 
   $effect.pre(() => {
     if (app.cardsShown) return;
-    const count = untrack(() => app.game?.activeEntries.length ?? 0);
-    if (count === 0) return;
+    // The parity card is still up after the last cards clear, so a finished
+    // game has something to animate out too.
+    const onGrid = untrack(() =>
+      app.game !== null && (app.game.activeEntries.length > 0 || app.showParity)
+    );
+    if (!onGrid) return;
     app.cardsExiting = true;
     return () => { app.cardsExiting = false; };
   });

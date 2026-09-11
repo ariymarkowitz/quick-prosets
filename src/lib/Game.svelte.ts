@@ -54,6 +54,9 @@ export class Game {
   deck: Card[] = $state([]);
   board: BoardEntry[] = $state([]);
   prosetsFound: number = $state(0);
+  // Counted the moment a selection becomes a proset, ahead of its flash, and
+  // never taken back — so it can key a celebration that outlasts the pipeline.
+  prosetsClaimed: number = $state(0);
   hintsUsed: boolean = $state(false);
   // True if the parity hint was ever visible during the game.
   parityUsed: boolean = $state(false);
@@ -170,6 +173,7 @@ export class Game {
     // The selection is claimed the moment it becomes a proset — of any size,
     // so there is nothing to submit and no wrong answer to reject.
     if (isValidProset(this.selectedCards)) {
+      this.prosetsClaimed += 1;
       this.resolution = { stage: 'flash', ids: this.selectedIds };
     }
   }

@@ -236,8 +236,8 @@
     flex: 1;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 10px;
+    justify-content: center;
+    gap: 1em;
     padding: 9px 10px;
     border-radius: var(--radius-md);
     font-size: var(--fs-sm);
@@ -247,10 +247,6 @@
 
   .option-row.active {
     color: var(--text);
-  }
-
-  .parity-label {
-    flex: 1;
   }
 
   .parity-switch {
