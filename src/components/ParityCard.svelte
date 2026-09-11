@@ -15,9 +15,9 @@
   );
 
   // The circles are shown unless the board is clearing, and transition between
-  // the two. The wash plays while a proset resolves; clicks are ignored until
+  // the two. The pulse plays while a proset resolves; clicks are ignored until
   // that ends, so the class always comes off before the next proset.
-  const washing = $derived(app.mode === 'chill' && (app.game?.resolvingProset ?? false));
+  const pulsing = $derived(app.mode === 'chill' && (app.game?.resolvingProset ?? false));
 
   // Report once every circle has waved out.
   let root: HTMLDivElement;
@@ -39,7 +39,7 @@
 >
   <div
     class="parity-ink"
-    class:wash={washing}
+    class:pulse={pulsing}
     class:wave-out={app.cardsExiting}
   >
     <CardFace card={parity} />
@@ -109,13 +109,13 @@
     }
   }
 
-  .parity-ink.wash :global(.dot) {
+  .parity-ink.pulse :global(.dot) {
     --out-delay: calc(var(--wave-pos, 0) * var(--remove-duration) / 5);
     animation:
       celebrate calc(var(--out-delay) + var(--remove-duration) + var(--deal-duration)) var(--out-delay);
   }
 
-  /* Clearing cuts a wash short rather than waiting on it. */
+  /* Clearing cuts a pulse short rather than waiting on it. */
   .parity-ink.wave-out :global(.dot) {
     --wave-duration: var(--remove-duration);
     --wave-easing: ease-in;
